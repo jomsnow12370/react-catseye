@@ -1,0 +1,243 @@
+body {
+  /* font-family: Poppins, Helvetica, Arial, sans-serif; */
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  background-color: #191919!important;
+}
+table{
+  font-family: "Poppins", sans-serif;
+}
+h1, h2, h3, h4, h5, h6{
+  font-family: "Poppins", sans-serif;
+}
+option{
+  font-family: "Poppins", sans-serif;
+}
+.searchInput {
+  text-transform: uppercase;
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  border-radius: 50px;
+  background-color: #65676B;
+}
+.names-list {
+  list-style-type: none;
+
+}
+.names {
+  font-size: smaller;
+  padding-left: 0!important;
+}
+.nameLink {
+  cursor: pointer;
+  font-weight: 650;
+  font-size:large;
+}
+.card{
+  border-radius: 10px!important;
+  background-color: #222222;
+  border-color: #222222!important;
+  box-shadow: 2px 5px 0px 0px rgba(0, 0, 0, 0.10);
+}
+.details {
+  font-size: small;
+  letter-spacing: 0.5px;
+}
+.nicl {
+}
+.remarks {
+  text-transform: lowercase;
+}
+.modal-shadow {
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.card {
+  border: none;
+}
+.btn {
+}
+.form-control {
+}
+.result{
+  padding-top: 10px;
+  font-size: small;
+}
+
+.flex-container{
+  display: flex;
+  justify-content: space-around;
+  list-style: none;
+  font-weight: 600;
+}
+
+.paginate{
+
+}
+
+.selected{
+  color:#0dcaf0;
+}
+.next, .previous{
+  color: #0dcaf0;
+}
+
+.logincard{
+  border-radius: 50px;
+}
+
+.poppins-thin {
+  font-family: "Poppins", sans-serif;
+  font-weight: 100;
+  font-style: normal;
+}
+
+.poppins-extralight {
+  font-family: "Poppins", sans-serif;
+  font-weight: 200;
+  font-style: normal;
+}
+
+.poppins-light {
+  font-family: "Poppins", sans-serif;
+  font-weight: 300;
+  font-style: normal;
+}
+
+.poppins-regular {
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.poppins-medium {
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+  font-style: normal;
+}
+
+.poppins-semibold {
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  font-style: normal;
+}
+
+.poppins-bold {
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  font-style: normal;
+}
+
+.poppins-extrabold {
+  font-family: "Poppins", sans-serif;
+  font-weight: 800;
+  font-style: normal;
+}
+
+.poppins-black {
+  font-family: "Poppins", sans-serif;
+  font-weight: 900;
+  font-style: normal;
+}
+
+.poppins-thin-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 100;
+  font-style: italic;
+}
+
+.poppins-extralight-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 200;
+  font-style: italic;
+}
+
+.poppins-light-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 300;
+  font-style: italic;
+}
+
+.poppins-regular-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-style: italic;
+}
+
+.poppins-medium-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+  font-style: italic;
+}
+
+.poppins-semibold-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  font-style: italic;
+}
+
+.poppins-bold-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  font-style: italic;
+}
+
+.poppins-extrabold-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 800;
+  font-style: italic;
+}
+
+.poppins-black-italic {
+  font-family: "Poppins", sans-serif;
+  font-weight: 900;
+  font-style: italic;
+}
+.form-white.input-group>.form-control:focus {
+  border-color: #fff;
+  box-shadow: inset 0 0 0 1px #fff;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+  color: #fff;
+}
+
+.navbar-dark .navbar-nav .nav-link:hover,
+.navbar-dark .navbar-nav .nav-link:focus {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.profile-head {
+  transform: translateY(5rem)
+}
+
+.cover {
+  background-image: url(https://images.unsplash.com/photo-1530305408560-82d13781b33a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1352&q=80);
+  background-size: cover;
+  background-repeat: no-repeat
+}
+
+.limited-height-card {
+  max-height: 90vh; /* Adjust the height as needed */
+  overflow-y: auto; /* Adds a scrollbar if content overflows */
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+@media print {
+  body {
+    color: black !important;
+  }
+
+  table {
+    color: black !important;
+  }
+
+  th,
+  td {
+    color: black !important;
+  }
+}
