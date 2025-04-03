@@ -436,24 +436,8 @@ const IncRegistration = () => {
           filteredLeaders.map((leader, index) => (
             <Card className="shadow-sm p-2 mt-2">
               <Row className="align-items-center">
-                <Col xs={2} className="text-center">
-                  <Card.Img
-                    src={
-                      `${getIp()}/profiles/${leader.photo}` ||
-                      `${getIp()}/userprofiles/k.jpg`
-                    }
-                    className="rounded-circle"
-                    style={{
-                      width: "80px",
-                      height: "80px",
-                      objectFit: "cover",
-                    }}
-                    onError={(e) =>
-                      (e.target.src = `${getIp()}/userprofiles/k.jpg`)
-                    }
-                  />
-                </Col>
-                <Col xs={10}>
+               
+                <Col xs={12}>
                   <Card.Body>
                     <Card.Title className="mb-0">
                       <i>{index + 1}. </i>

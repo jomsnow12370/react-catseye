@@ -106,9 +106,9 @@ const Login = () => {
           <Button variant="success" className="w-100 mb-2" onClick={() => handleNavigation("/registration")}>
             Go to Leader Registration
           </Button>
-          <Button variant="info" className="w-100 mb-2" onClick={() => handleNavigation("/incregistration")}>
+          {/* <Button variant="info" className="w-100 mb-2" onClick={() => handleNavigation("/incregistration")}>
             Go to Inc Registration
-          </Button>
+          </Button> */}
           <Button variant="dark" className="w-100" onClick={() => handleNavigation("/wardinglogs")}>
             Go to Dashboard
           </Button>

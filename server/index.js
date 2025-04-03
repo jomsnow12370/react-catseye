@@ -847,8 +847,9 @@ app.get("/login", (req, res) => {
   const userName = req.query.userName;
   const password = req.query.password;
 
-  const query = "SELECT user_id, fname, user_type FROM userstbl WHERE username = ? AND password = ?";
-  
+  const query =
+    "SELECT user_id, fname, user_type FROM userstbl WHERE username = ? AND password = ?";
+
   db.query(query, [userName, password], (error, results) => {
     if (error) {
       console.error("Database error:", error);
@@ -863,7 +864,6 @@ app.get("/login", (req, res) => {
     res.json(user); // Send user data
   });
 });
-
 
 // Logout route
 app.get("/logout", (req, res) => {
@@ -1893,55 +1893,66 @@ app.get("/userTags", (req, res) => {
 app.get("/status", (req, res, next) => res.sendStatus(200));
 
 app.post("/saveProfilepic", (req, res) => {
-  const uid = req.query.userid;
-
-  const datestring = getCurrentDate();
-  var datenow = datestring.date + " " + datestring.time;
-
-  const fname = req.query.fname;
-  const lname = req.query.lname;
-  const password = req.query.password;
-
-  // console.log(fname);
-  // console.log(lname);
-  // console.log(password);
-
   try {
-    uploadUser(req, res, async (err) => {
-      if (err) {
-        // Handle upload error
-        console.error(err);
-        return res.status(500).json({ error: "Failed to upload file" });
-      }
+    const uid = req.query.userid;
+    const datestring = getCurrentDate();
+    var datenow = datestring.date + " " + datestring.time;
+    const fname = req.query.fname;
+    const lname = req.query.lname;
+    const password = req.query.password;
 
-      const filename = req.file.filename;
+    try {
+      uploadUser(req, res, async (err) => {
+        if (err) {
+          // Handle upload error
+          console.error(err);
+          return res.status(500).json({ error: "Failed to upload file" });
+        }
 
-      console.log(fname);
+        let query;
 
-      const query =
-        "UPDATE userstbl SET fname = '" +
-        fname +
-        "', lname = '" +
-        lname +
-        "', imgname = '" +
-        filename +
-        "', password = '" +
-        password +
-        "' WHERE user_id = '" +
-        uid +
-        "'";
-      console.log(query);
-      await db.query(query, function (err, result) {
-        if (err) throw err;
-        //console.log("File name saved in database:", filename);
-        console.log(result);
-        res.status(200).json({ message: "File uploaded successfully" });
+        // Check if a file was uploaded
+        if (req.file) {
+          // File was uploaded, include the filename in the update
+          const filename = req.file.filename;
+          query =
+            "UPDATE userstbl SET fname = '" +
+            fname +
+            "', lname = '" +
+            lname +
+            "', imgname = '" +
+            filename +
+            "', password = '" +
+            password +
+            "' WHERE user_id = '" +
+            uid +
+            "'";
+        } else {
+          // No file was uploaded, update other fields only
+          query =
+            "UPDATE userstbl SET fname = '" +
+            fname +
+            "', lname = '" +
+            lname +
+            "', password = '" +
+            password +
+            "' WHERE user_id = '" +
+            uid +
+            "'";
+        }
+
+        console.log(query);
+        await db.query(query, function (err, result) {
+          if (err) throw err;
+          console.log(result);
+          res.status(200).json({ message: "Profile updated successfully" });
+        });
       });
-    });
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    res.status(500).json({ message: "Internal Server Error" });
-  }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      res.status(500).json({ message: "Internal Server Error" });
+    }
+  } catch (error) {}
 });
 
 app.get("/getUserData", (req, res) => {
@@ -2283,7 +2294,7 @@ app.get("/getHouseholds", async (req, res) => {
       });
 
       const memberSql =
-        "SELECT v_info.v_id as vid, CONCAT(v_lname, ', ', v_fname, ' ', v_mname) as fullname, municipality, barangay, mem_v_id, (SELECT remarks_txt from v_remarks INNER JOIN quick_remarks ON quick_remarks.remarks_id = v_remarks.remarks_id WHERE category_id = '55' and v_id = vid ORDER BY v_remarks_id DESC LIMIT 1) as cong, (SELECT remarks_txt from v_remarks INNER JOIN quick_remarks ON quick_remarks.remarks_id = v_remarks.remarks_id WHERE category_id = '56' and v_id = vid ORDER BY v_remarks_id DESC LIMIT 1) as gov, (SELECT remarks_txt from v_remarks INNER JOIN quick_remarks ON quick_remarks.remarks_id = v_remarks.remarks_id WHERE category_id = '57' and v_id = vid ORDER BY v_remarks_id DESC LIMIT 1) as vgov from household_warding INNER JOIN v_info ON v_info.v_id = mem_v_id INNER JOIN barangays ON barangays.id = v_info.barangayId WHERE fh_v_id = '" +
+        "SELECT v_info.v_id, v_info.v_id as vid, CONCAT(v_lname, ', ', v_fname, ' ', v_mname) as fullname, municipality, barangay, mem_v_id, (SELECT remarks_txt from v_remarks INNER JOIN quick_remarks ON quick_remarks.remarks_id = v_remarks.remarks_id WHERE category_id = '55' and v_id = vid ORDER BY v_remarks_id DESC LIMIT 1) as cong, (SELECT remarks_txt from v_remarks INNER JOIN quick_remarks ON quick_remarks.remarks_id = v_remarks.remarks_id WHERE category_id = '56' and v_id = vid ORDER BY v_remarks_id DESC LIMIT 1) as gov, (SELECT remarks_txt from v_remarks INNER JOIN quick_remarks ON quick_remarks.remarks_id = v_remarks.remarks_id WHERE category_id = '57' and v_id = vid ORDER BY v_remarks_id DESC LIMIT 1) as vgov from household_warding INNER JOIN v_info ON v_info.v_id = mem_v_id INNER JOIN barangays ON barangays.id = v_info.barangayId WHERE fh_v_id = '" +
         v_id +
         "' ORDER BY household_warding.id ASC";
       const members = await new Promise((resolve, reject) => {
@@ -3426,7 +3437,7 @@ app.post("/uploadSignature", (req, res) => {
 
     try {
       await db.query(query);
-      console.log(query)
+      console.log(query);
       res.status(200).json({
         message: "Signature uploaded successfully",
         fileName: filename,
@@ -3666,7 +3677,7 @@ app.get("/getleadersincliquidation", (req, res) => {
   var timeTo = req.query.timeTo;
 
   var type = req.query.type;
-  console.log(type)
+  console.log(type);
 
   let typequery = "";
   if (type !== "") {
@@ -3806,6 +3817,7 @@ app.get("/checkIfHasTag", (req, res) => {
 
   // Execute the database query
   db.query(query, [id, tag], (error, results) => {
+    console.log(query + " " + id + " " + tag);
     if (error) {
       console.error("Database error:", error);
       return res.status(500).json({

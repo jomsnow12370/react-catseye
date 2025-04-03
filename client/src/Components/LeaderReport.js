@@ -92,7 +92,7 @@ const LeaderReport = () => {
 
   const getCategoryLabel = () => {
     if (reportCategory === "laynes") return "[Laynes]";
-    if (reportCategory === "cua-laynes") return "[Cua-Laynes]";
+    if (reportCategory === "cua-laynes") return "[Cua-Laynes-Fernandez]";
     return "";
   };
 
@@ -366,7 +366,7 @@ const LeaderReport = () => {
             onChange={(e) => setReportCategory(e.target.value)}
             className="mb-3"
           >
-            <option value="cua-laynes">Cua-Laynes</option>
+            <option value="cua-laynes">Cua-Laynes-Fernandez</option>
             <option value="cua">Cua</option>
             <option value="laynes">Laynes</option>
           </Form.Select>

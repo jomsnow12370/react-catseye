@@ -299,9 +299,8 @@ const Home = () => {
             
 
             var img = getIp() + `/userprofiles/k.jpg`;
-            
+
             if (voters.vImg[0]) {
-           
               if (voters.vImg[0].type !== 1) {
                 img = getIp() + `/profiles/${voters.vImg[0].imgname}`;
               } else {
@@ -309,8 +308,6 @@ const Home = () => {
                   getIp() +
                   `/profiles/${voters.v_idx}/${voters.vImg[0].imgname}`;
               }
-
-
             }
 
             return (
@@ -323,7 +320,6 @@ const Home = () => {
                   borderRadius: "10px",
                 }}
               >
-                {/* {JSON.stringify(voters)} */}
                 <Row className="align-items-center">
                   <Col lg={2}>
                     <Image

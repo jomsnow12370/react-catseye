@@ -21,7 +21,7 @@ import LeaderManagement from "./Components/WardingLeaderList";
 import WardingReport from "./Components/WardingReport";
 import Registration from "./Components/LeaderRegistration";
 import LiquidationReport from "./Components/LiquidationReport";
-import HouseholdWarding from "./Components/HouseholdWarding";
+// import HouseholdWarding from "./Components/HouseholdWarding";
 import IncRegistration from "./Components/IncRegistration";
 import LiquidationIncReport from "./Components/LiquidationIncReport";
 
@@ -47,7 +47,7 @@ function App() {
         <Route path="/householdreport" element={[<Nav />,<HouseHoldReport />]} />
         <Route path="/leaderwardinglist" element={[<Nav />,<LeaderManagement />]} />
         <Route path="/liquidationreport" element={[<Nav />,<LiquidationReport />]} />
-        <Route path="/householdwarding" element={[<Nav />,<HouseholdWarding />]} />
+        {/* <Route path="/householdwarding" element={[<Nav />,<HouseholdWarding />]} /> */}
         <Route path="/registration" element={<Registration />} />
         <Route path="/incregistration" element={<IncRegistration />} />
         <Route path="/liquidationincreport" element={[<Nav />,<LiquidationIncReport />]} />

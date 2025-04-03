@@ -10,7 +10,7 @@ const LiquidationReport = () => {
   const [barangay, setBarangay] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
   const [timeFrom, setTimeFrom] = useState("00:00:00");
-  const [timeTo, setTimeTo] = useState("24:59:59");
+  const [timeTo, setTimeTo] = useState("23:59:59");
   const reportRef = useRef(null);
 
   const fetchBarangays = async (municipality) => {
@@ -64,7 +64,7 @@ const LiquidationReport = () => {
 
   return (
     <Container className="mt-5">
-      <h1>Liquidation Report</h1>
+      <h1 className="">Liquidation Report</h1>
       <Row>
         <Col md={4}>
           <Form.Group>

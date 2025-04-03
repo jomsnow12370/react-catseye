@@ -76,7 +76,7 @@ const CreateTag = (props) => {
 
   useEffect(() => {
     setIsLoading(true);
-  
+    
     fetch(getIp() + `/checkIfHasTag?id=${vid}&tag=${tagId}`)
       .then(response => response.json())
       .then(data => {

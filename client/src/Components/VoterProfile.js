@@ -292,6 +292,7 @@ const VoterProfile = ({ voter }) => {
         console.error("Error:", error);
       });
     // console.log("DELETE" + imgname + voter.v_id)
+    alert("File removed");
   };
 
   const handleDeleteLeader = (id) => {
@@ -904,7 +905,7 @@ const VoterProfile = ({ voter }) => {
                         )}
                       </strong>
                       <div className="text-muted small">
-                        {result.address} | {result.v_id}
+                        {result.address} | {result.bday} | {result.v_id} 
                       </div>
                     </div>
                     <Button

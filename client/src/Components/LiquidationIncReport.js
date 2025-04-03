@@ -56,11 +56,10 @@ const LiquidationIncReport = () => {
     };
     return categoryMap[id] || "";
   }
-
   const handlePrint = () => {
     window.print();
   };
-
+  
   return (
     <Container className="mt-5">
       <h1>Liquidation Report</h1>
@@ -172,68 +171,69 @@ const LiquidationIncReport = () => {
         </Col>
       </Row>
 
-      <div ref={reportRef} className="mt-3">
-        <Row>
-          <Col>
-            <h2 className="text-center">Liquidation Report</h2>
-            <h3 className="text-center">
-              {getCategoryLabel(Number(filterType))} {barangay} {municipality}{" "}
-              <br />
-              <small style={{ fontSize: "60%" }}>{selectedDate}</small>
-            </h3>
-            <Table bordered text-dark className="table">
-              <thead>
-                <tr>
-                  <th>No.</th>
-                  <th>Name</th>
-                  <th className="text-center">Barangay</th>
-                  <th className="text-center">Category</th>
-                  <th className="text-center">Signature</th>
+      <div ref={reportRef} id="printable-content" className="mt-3">
+  <Row>
+    <Col>
+      <h2 className="text-center">Liquidation Report</h2>
+      <h3 className="text-center">
+        {getCategoryLabel(Number(filterType))} {barangay} {municipality}{" "}
+        <br />
+        <small style={{ fontSize: "60%" }}>{selectedDate}</small>
+      </h3>
+      <Table bordered text-dark className="table">
+        <thead>
+          <tr>
+            <th>No.</th>
+            <th>Name</th>
+            <th className="text-center">Barangay</th>
+            <th className="text-center">Category</th>
+            <th className="text-center">Signature</th>
+          </tr>
+        </thead>
+        <tbody>
+          {leaders.length > 0 ? (
+            leaders.map((leader, index) => {
+              const signatureUrl = `${getIp()}/profiles/${leader.v_id}/${leader.imgname}`;
+              return (
+                <tr key={leader.id}>
+                  <td className="text-center">{index + 1}</td>
+                  <td>
+                    {leader.v_lname}, {leader.v_fname} {leader.v_mname}
+                  </td>
+                  <td className="text-center">{leader.barangay}</td>
+                  <td className="text-center">{leader.remarks_txt}</td>
+                  <td className="text-center">
+                    {leader.imgname ? (
+                      <img
+                        src={signatureUrl}
+                        alt="Signature"
+                        style={{
+                          width: "100px",
+                          height: "100px",
+                          objectFit: "contain",
+                          transform: "rotate(270deg)",
+                        }}
+                      />
+                    ) : (
+                      "No Signature"
+                    )}
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {leaders.length > 0 ? (
-                  leaders.map((leader, index) => {
-                    const signatureUrl = `${getIp()}/profiles/${leader.v_id}/${leader.imgname}`;
-                    return (
-                      <tr key={leader.id}>
-                        <td className="text-center">{index + 1}</td>
-                        <td>
-                          {leader.v_lname}, {leader.v_fname} {leader.v_mname}
-                        </td>
-                        <td className="text-center">{leader.barangay}</td>
-                        <td className="text-center">{leader.remarks_txt}</td>
-                        <td className="text-center">
-                          {leader.imgname ? (
-                            <img
-                              src={signatureUrl}
-                              alt="Signature"
-                              style={{
-                                width: "100px",
-                                height: "100px",
-                                objectFit: "contain",
-                                transform: "rotate(270deg)",
-                              }}
-                            />
-                          ) : (
-                            "No Signature"
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })
-                ) : (
-                  <tr>
-                    <td colSpan="5" className="text-center">
-                      No attendance records found.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </Table>
-          </Col>
-        </Row>
-      </div>
+              );
+            })
+          ) : (
+            <tr>
+              <td colSpan="5" className="text-center">
+                No attendance records found.
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </Table>
+    </Col>
+  </Row>
+</div>
+
     </Container>
   );
 };

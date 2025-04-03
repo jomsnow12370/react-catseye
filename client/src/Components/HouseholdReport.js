@@ -97,7 +97,7 @@ const HouseHoldReport = () => {
         </head>
         <body>
           <h3>Household Warding Report  ${new Date().toLocaleString()}</h3>
-          <h4>${municipality}</h4>
+          <h4>${municipality} ${barangay}</h4>
           ${printOption === "summary" ? printContent2 : printContent} 
         </body>
       </html>

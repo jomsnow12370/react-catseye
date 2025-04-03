@@ -278,7 +278,7 @@ const Registration = () => {
         body: JSON.stringify({
           leader_id: leader.v_id,
           userid: userId,
-             }),
+        }),
       });
       if (response.ok) {
         const data = await response.json();
@@ -364,6 +364,36 @@ const Registration = () => {
     }
   };
 
+  const handleDelete = (leader) => {
+    // Show confirmation dialog
+    const isConfirmed = window.confirm(
+      "Are you sure you want to delete this signature?"
+    );
+
+    // Proceed only if user confirms
+    if (isConfirmed) {
+      fetch(`${getIp()}/deleteSign?vid=${leader.v_id}`, {
+        method: "POST",
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          const updatedLeaders = leaders.map((leaderx) =>
+            leaderx.v_id === leader.v_id
+              ? { ...leaderx, signature: null }
+              : leaderx
+          );
+          setLeaders(updatedLeaders);
+          toast.success("Signature removed..");
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          alert("An error occurred while deleting the signature.");
+        });
+    } else {
+      alert("Signature deletion canceled.");
+    }
+  };
+
   return (
     <Container fluid className="poppins-regular p-2">
       <Toaster />
@@ -372,12 +402,11 @@ const Registration = () => {
           <h1>Leader Registration</h1>
         </Col>
         <Col xs={2}>
-        <Button
+          <Button
             variant="success"
             className="w-100"
             title="Liquidation Report"
             onClick={() => {
-             
               navigate("/liquidationreport");
             }}
           >
@@ -494,21 +523,15 @@ const Registration = () => {
               <Card className="shadow-sm p-2">
                 <Row className="align-items-center">
                   <Col xs={2} className="text-center">
-                    <Card.Img
-                      src={
-                        `${getIp()}/profiles/${leader.photo}` ||
-                        `${getIp()}/userprofiles/k.jpg`
-                      }
-                      className="rounded-circle"
-                      style={{
-                        width: "80px",
-                        height: "80px",
-                        objectFit: "cover",
-                      }}
-                      onError={(e) =>
-                        (e.target.src = `${getIp()}/userprofiles/k.jpg`)
-                      }
-                    />
+                    <Card.Text className="text-center">
+                      <i
+                        className="bi bi-person-circle"
+                        style={{
+                          fontSize: "80px",
+                          color: "#6c757d", // Bootstrap's secondary color, you can adjust as needed
+                        }}
+                      ></i>
+                    </Card.Text>
                   </Col>
                   <Col xs={10}>
                     <Card.Body>
@@ -530,17 +553,25 @@ const Registration = () => {
                         {leader.laynes === 1 && " - Laynes"}
                       </Card.Text>
                       <ButtonGroup className="w-100">
-                          <Button
+                        <Button
                           size="sm"
-                          variant={
+                          variant={leader.signature >= 1 ? "danger" : "dark"}
+                          onClick={() =>
                             leader.signature >= 1
-                              ? "success"
-                              : "dark"
+                              ? handleDelete(leader)
+                              : handleSignature(leader)
                           }
-                          onClick={() => handleSignature(leader)}
-                          disabled={leader.signature >= 1}
+                          disabled={!leader.v_id} // Disable if leader is not a valid object
                         >
-                          <i className="bi bi-pen"></i> Sign
+                          {leader.signature >= 1 ? (
+                            <>
+                              <i className="bi bi-trash mr-2"></i> Sign
+                            </>
+                          ) : (
+                            <>
+                              <i className="bi bi-pen mr-2"></i> Sign
+                            </>
+                          )}
                         </Button>
                         <Button
                           size="sm"
@@ -592,89 +623,94 @@ const Registration = () => {
 
       {/* Signature Modal */}
       <Modal show={showModal} onHide={() => setShowModal(false)} fullscreen>
-  <Modal.Body className="p-0">
-    <div
-      ref={canvasContainerRef}
-      style={{ width: "100%", height: "100vh", position: "relative", overflow: "hidden" }}
-    >
-      <div style={{ backgroundColor: "white", height: "100%" }}>
-        <SignatureCanvas
-          ref={(ref) => setSigPad(ref)}
-          penColor="black"
-          dotSize={12}
-          minWidth={3}
-          maxWidth={6}
-          canvasProps={{
-            width: canvasContainerRef.current
-              ? canvasContainerRef.current.offsetWidth
-              : window.innerWidth,
-            height: canvasContainerRef.current
-              ? canvasContainerRef.current.offsetHeight - 100
-              : window.innerHeight - 100,
-          }}
-        />
-      </div>
+        <Modal.Body className="p-0">
+          <div
+            ref={canvasContainerRef}
+            style={{
+              width: "100%",
+              height: "100vh",
+              position: "relative",
+              overflow: "hidden",
+            }}
+          >
+            <div style={{ backgroundColor: "white", height: "100%" }}>
+              <SignatureCanvas
+                ref={(ref) => setSigPad(ref)}
+                penColor="black"
+                dotSize={12}
+                minWidth={3}
+                maxWidth={6}
+                canvasProps={{
+                  width: canvasContainerRef.current
+                    ? canvasContainerRef.current.offsetWidth
+                    : window.innerWidth,
+                  height: canvasContainerRef.current
+                    ? canvasContainerRef.current.offsetHeight - 100
+                    : window.innerHeight - 100,
+                }}
+              />
+            </div>
 
-      {/* Floating action buttons - fixed position to ensure visibility */}
-      <div
-        style={{
-          position: "fixed",
-          bottom: "20px",
-          right: "20px",
-          display: "flex",
-          gap: "10px",
-          zIndex: 1050,
-        }}
-      >
-        <Button
-          variant="danger"
-          onClick={() => setShowModal(false)}
-          style={{
-            borderRadius: "50%",
-            width: "60px",
-            height: "60px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-          }}
-        >
-             <i className="bi bi-x"></i>
-        </Button>
-        <Button
-          variant="warning"
-          onClick={() => sigPad.clear()}
-          style={{
-            borderRadius: "50%",
-            width: "60px",
-            height: "60px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-          }}
-        >
-             <i className="bi bi-eraser"></i>
-        </Button>
-        <Button
-          variant="primary"
-          onClick={handleSignatureSave}
-          style={{
-            borderRadius: "50%",
-            width: "60px",
-            height: "60px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-          }}
-        >
-          <i className="bi bi-save"></i>
-        </Button>
-      </div>
-    </div>
-  </Modal.Body>
-</Modal>
+            {/* Floating action buttons - fixed position to ensure visibility */}
+            <div
+              style={{
+                position: "fixed",
+                bottom: "20px",
+                right: "20px",
+                display: "flex",
+                gap: "10px",
+                zIndex: 1050,
+              }}
+            >
+              <Button
+                variant="danger"
+                onClick={() => setShowModal(false)}
+                style={{
+                  borderRadius: "50%",
+                  width: "60px",
+                  height: "60px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+                }}
+              >
+                <i className="bi bi-x"></i>
+              </Button>
+              <Button
+                variant="warning"
+                onClick={() => sigPad.clear()}
+                style={{
+                  borderRadius: "50%",
+                  width: "60px",
+                  height: "60px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+                }}
+              >
+                <i className="bi bi-eraser"></i>
+              </Button>
+              <Button
+                variant="primary"
+                onClick={handleSignatureSave}
+                style={{
+                  borderRadius: "50%",
+                  width: "60px",
+                  height: "60px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+                }}
+              >
+                <i className="bi bi-save"></i>
+              </Button>
+            </div>
+          </div>
+        </Modal.Body>
+      </Modal>
 
       {/* Photo Upload Modal */}
       <Modal show={showPhotoModal} onHide={() => setShowPhotoModal(false)}>

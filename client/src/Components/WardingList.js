@@ -17,6 +17,7 @@ import { getIp } from "./Vars";
 import Spinner from "react-bootstrap/Spinner";
 import { toast, Toaster } from "react-hot-toast";
 import CreateTag from "./CreateTag";
+import HouseholdWardingTags from "./HouseholdWardingTags";
 
 const WardingList = () => {
   const navigate = useNavigate();
@@ -37,6 +38,7 @@ const WardingList = () => {
   const [barangay, setBarangay] = useState("");
   const [addMemberText, setAddmemberText] = useState("");
   const [searchLeadertxt, setSearchLeadertxt] = useState("");
+  const [editingLeader, setEditingLeader] = useState(false);
 
   // New state for updating Family Head:
   const [searchFhTxt, setSearchFhTxt] = useState("");
@@ -49,21 +51,23 @@ const WardingList = () => {
   const [leaders, setLeaders] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Filter households based on the search query
-  const filteredHouseholds = households.filter((family) => {
-    // Check if family head name matches search query
-    const fhMatches = family.fh
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
+ // Filter households based on the search query
+ // Filter households based on the search query
+const filteredHouseholds = households.filter((family) => {
+  // Check if family head name matches search query
+  const fhMatches =
+    family.fh?.toLowerCase().includes(searchQuery.toLowerCase()) || false;
 
-    // Check if any family member's name matches search query
-    const memberMatches = family.members.some((member) =>
-      member.fullname.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+  // Check if any family member's name matches search query, handling empty or undefined members
+  const memberMatches = Array.isArray(family.members)
+    ? family.members.some((member) =>
+        member.fullname?.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : false;
 
-    // Return true if either the family head or any member matches
-    return fhMatches || memberMatches;
-  });
+  // Return true if either the family head or any member matches
+  return fhMatches || memberMatches;
+});
 
   const handleMunicipalityChange = (event) => {
     const selectedMunicipality = event.target.value;
@@ -247,10 +251,11 @@ const WardingList = () => {
         })
         .catch((error) => console.error("ERR: " + error));
 
-      alert("Leader was saved successfully.");
+      toast.success("Leader was saved successfully.");
+      setEditingLeader(false);
     } catch (error) {
       console.error("Error while saving:", error);
-      alert("Error while saving leader.");
+      toast.error("Error while saving leader.");
     }
   };
 
@@ -297,6 +302,7 @@ const WardingList = () => {
   const handleCloseModal = () => {
     setShowModal(false);
     setSelectedHousehold(null);
+    setEditingLeader(false);
   };
 
   const handleEditHousehold = (householdId) => {
@@ -352,6 +358,13 @@ const WardingList = () => {
         console.error("Error while deleting member:", error);
       }
     }
+  };
+
+  // New function to enable leader editing
+  const toggleEditLeader = () => {
+    setEditingLeader(!editingLeader);
+    setSearchLeadertxt("");
+    setLeaders([]);
   };
 
   useEffect(() => {
@@ -501,10 +514,8 @@ const WardingList = () => {
                                   <table className="table table-bordered table-striped">
                                     <thead>
                                       <tr>
-                                        <th>Member Information</th>
-                                        <th>Congressman</th>
-                                        <th>Governor</th>
-                                        <th>VGovernor</th>
+                                        <th>Member Fullname</th>
+                                        <th>Address</th>
                                       </tr>
                                     </thead>
                                     <tbody>
@@ -516,6 +527,8 @@ const WardingList = () => {
                                                 {/* {JSON.stringify(member)} */}
                                                 {memberIndex + 1}.{" "}
                                                 {member.fullname}
+                                              </td>
+                                              <td>
                                                 <div>
                                                   <i>
                                                     {member.barangay}{" "}
@@ -523,113 +536,9 @@ const WardingList = () => {
                                                   </i>
                                                 </div>
                                               </td>
-
-                                              <td className="text-center">
-                                                <CreateTag
-                                                  id={member.vid}
-                                                  tagName="Samuel Laynes (Survey 2025)"
-                                                  tagTooltip="SL"
-                                                  tagId="660"
-                                                  userId={userId}
-                                                />
-
-                                                <CreateTag
-                                                  id={member.vid}
-                                                  tagName="Leo Rodriguez (Survey 2025)"
-                                                  tagTooltip="LR"
-                                                  tagId="661"
-                                                  userId={userId}
-                                                />
-
-                                                <CreateTag
-                                                  id={member.vid}
-                                                  tagName="Jan Alberto (Survey 2025)"
-                                                  tagTooltip="JA"
-                                                  tagId="678"
-                                                  userId={userId}
-                                                />
-
-                                                <CreateTag
-                                                  id={member.vid}
-                                                  tagName="UndecidedCong(Survey 2025)"
-                                                  tagTooltip="UD"
-                                                  tagId="679"
-                                                  userId={userId}
-                                                />
-
-                                                {/* <NewTag id={item.v_id} /> */}
-                                              </td>
-                                              <td className="text-center">
-                                                <CreateTag
-                                                  id={member.vid}
-                                                  tagName="BossTe(Survey 2025)"
-                                                  tagTooltip="PC"
-                                                  tagId="662"
-                                                  userId={userId}
-                                                />
-
-                                                <CreateTag
-                                                  id={member.vid}
-                                                  tagName="Asanza(Survey 2025)"
-                                                  tagTooltip="PA"
-                                                  tagId="663"
-                                                  userId={userId}
-                                                />
-
-                                                <CreateTag
-                                                  id={member.vid}
-                                                  tagName="UndecidedGov(Survey 2025)"
-                                                  tagTooltip="UD"
-                                                  tagId="680"
-                                                  userId={userId}
-                                                />
-
-                                                {/* <NewTag id={item.v_id} /> */}
-                                              </td>
-                                              <td className="text-center">
-                                                <CreateTag
-                                                  id={member.vid}
-                                                  tagName="Fernandez(Survey 2025)"
-                                                  tagTooltip="OF"
-                                                  tagId="676"
-                                                  userId={userId}
-                                                />
-
-                                                <CreateTag
-                                                  id={member.vid}
-                                                  tagName="Abundo(Survey 2025)"
-                                                  tagTooltip="SA"
-                                                  tagId="677"
-                                                  userId={userId}
-                                                />
-
-                                                <CreateTag
-                                                  id={member.vid}
-                                                  tagName="UndecidedVGov(Survey 2025)"
-                                                  tagTooltip="UD"
-                                                  tagId="681"
-                                                  userId={userId}
-                                                />
-
-                                                {/* <NewTag id={item.v_id} /> */}
-                                              </td>
-
-                                              <td className="text-center">
-                                                <CreateTag
-                                                  id={member.vid}
-                                                  tagName="Outside Province(Household Warding)"
-                                                  tagTooltip="OP"
-                                                  tagId="626"
-                                                  userId={userId}
-                                                />
-                                              </td>
-
-                                              <td className="text-center">
-                                                <CreateTag
-                                                  id={member.vid}
-                                                  tagName="Needs Assistance(Household Warding)"
-                                                  tagTooltip="NA"
-                                                  tagId="682"
+                                              <td>
+                                                <HouseholdWardingTags
+                                                  leader={member}
                                                   userId={userId}
                                                 />
                                               </td>
@@ -678,46 +587,55 @@ const WardingList = () => {
               {/* Leader Section */}
               <p>
                 Leader:{" "}
-                <strong>
-                  {!selectedHousehold.leaderid ? (
-                    <>
-                      <InputGroup className="mb-3">
-                        <Form.Control
-                          placeholder="Search leader"
-                          aria-label="Search leader"
-                          value={searchLeadertxt}
-                          onChange={(e) => setSearchLeadertxt(e.target.value)}
-                        />
+                {!selectedHousehold.leaderid || editingLeader ? (
+                  <>
+                    <InputGroup className="mb-3">
+                      <Form.Control
+                        placeholder="Search leader"
+                        aria-label="Search leader"
+                        value={searchLeadertxt}
+                        onChange={(e) => setSearchLeadertxt(e.target.value)}
+                      />
+                      <Button
+                        variant="outline-secondary"
+                        onClick={handleSearchLeader}
+                      >
+                        <i className="bi bi-search"></i> Find
+                      </Button>
+                    </InputGroup>
+                    {leaders &&
+                      searchLeadertxt !== "" &&
+                      leaders.map((item, index) => (
                         <Button
-                          variant="outline-secondary"
-                          onClick={handleSearchLeader}
+                          key={index}
+                          size="sm"
+                          variant="dark"
+                          className="me-1 mb-1"
+                          onClick={() =>
+                            handleAddLeader(
+                              item.v_id,
+                              selectedHousehold.fhid,
+                              item.fullname
+                            )
+                          }
                         >
-                          <i className="bi bi-search"></i> Find
+                          {item.fullname}
                         </Button>
-                      </InputGroup>
-                      {leaders &&
-                        searchLeadertxt !== "" &&
-                        leaders.map((item, index) => (
-                          <Button
-                            key={index}
-                            size="sm"
-                            variant="dark"
-                            onClick={() =>
-                              handleAddLeader(
-                                item.v_id,
-                                selectedHousehold.fhid,
-                                item.fullname
-                              )
-                            }
-                          >
-                            {item.fullname}
-                          </Button>
-                        ))}
-                    </>
-                  ) : (
-                    <>{selectedHousehold.leader[0].fullname}</>
-                  )}
-                </strong>
+                      ))}
+                  </>
+                ) : (
+                  <>
+                    <strong>{selectedHousehold.leader[0].fullname}</strong>
+                    <Button
+                      variant="link"
+                      size="sm"
+                      onClick={toggleEditLeader}
+                      className="ms-2"
+                    >
+                      <i className="bi bi-pencil"></i> Edit
+                    </Button>
+                  </>
+                )}
               </p>
               {/* Family Head Section */}
               <h5>
@@ -742,6 +660,7 @@ const WardingList = () => {
                     key={index}
                     size="sm"
                     variant="dark"
+                    className="me-1 mb-1"
                     disabled={item.cnt + item.cnt2 > 0}
                     title={item.barangay + ", " + item.municipality}
                     onClick={() =>
@@ -761,6 +680,7 @@ const WardingList = () => {
                       <Button
                         variant="dark"
                         size="sm"
+                        className="ms-2"
                         onClick={() =>
                           handleDeleteMember(
                             selectedHousehold.fhid,
@@ -803,6 +723,7 @@ const WardingList = () => {
                     key={index}
                     size="sm"
                     variant="dark"
+                    className="me-1 mb-1"
                     disabled={item.cnt + item.cnt2 > 0}
                     title={item.barangay + ", " + item.municipality}
                     onClick={() =>

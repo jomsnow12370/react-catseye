@@ -19,7 +19,6 @@ import { useNavigate } from "react-router-dom";
 import Spinner from "react-bootstrap/Spinner";
 import { getIp, getUserId } from "./Vars";
 import CreateTag from "./CreateTag";
-import HouseholdWardingTags from "./HouseholdWardingTags";
 
 import NewTag from "./NewTag";
 
@@ -111,17 +110,11 @@ const Warding = () => {
     return () => clearTimeout(delayDebounceFn);
   }, [leaderSearchQuery]);
 
-  
   const handleLeaderSearch = async (query) => {
     setIsLeaderSearching(true);
-    var mun = municipality;
-    var brgy = barangay;
     try {
       const response = await fetch(
-        getIp() +
-          `/searchLeader?text=${encodeURIComponent(
-            query
-          )}&mun=${mun}&brgy=${brgy}`
+        getIp() + `/searchLeader?text=${encodeURIComponent(query)}`
       );
       const data = await response.json();
       setLeaderSearchResults(data);
@@ -336,37 +329,36 @@ const Warding = () => {
                     <tr>
                       <th>#</th>
                       <th>Information</th>
-                      <th>Address</th>
-                      <th className="text-center">Family Head</th>
-                      <th className="text-center">Family Member</th>
-                      <th className="text-center" width="400px">Tags</th>
+                      <th className="text-center">FH</th>
+                      <th className="text-center">FM</th>
+                      <th className="text-center">CONG</th>
+                      <th className="text-center">GOV</th>
+                      <th className="text-center">VGOV</th>
+                      <th className="text-center">OP</th>
+                      <th className="text-center">NA</th>
                     </tr>
                   </thead>
                   <tbody>
                     {!isPending ? (
                       voters.map((item, index) => (
                         <tr
-                        key={item.v_id}
-                        data-toggle="tooltip"
-                        title={
-                          item.tagged[0].leadercnt > 0 &&  item.tagged[0].cnt == 0 && item.tagged[0].cntt == 0
-                              ? "Leader"
-                              : item.tagged[0].cnt > 0 || item.tagged[0].cntt > 0
-                              ? "Household member of: " +
-                                item.tagged[0].fhfullname +
-                                " recorded by: " +
-                                item.tagged[0].username
+                          key={item.v_id}
+                          data-toggle="tooltip"
+                          title={
+                            item.tagged[0].leadercnt > 0 
+                            ? "Leader" 
+                            : item.tagged[0].cnt > 0 || item.tagged[0].cntt > 0 
+                              ? "Household member of: " + item.tagged[0].fhfullname + " recorded by: " + item.tagged[0].username 
                               : "NO WARDING RECORD"
-                      }
-                      >
+                          }
+                        >
                           <td
                             width={30}
                             className="text-center"
                             style={{
                               backgroundColor:
                                 item.tagged[0].cnt > 0 ||
-                                item.tagged[0].cntt > 0 ||
-                                item.tagged[0].leadercnt > 0
+                                item.tagged[0].cntt > 0  || item.tagged[0].leadercnt > 0
                                   ? "green"
                                   : "transparent",
                               color: item.record_type == 2 && "red",
@@ -379,8 +371,7 @@ const Warding = () => {
                             style={{
                               backgroundColor:
                                 item.tagged[0].cnt > 0 ||
-                                item.tagged[0].cntt > 0 ||
-                                item.tagged[0].leadercnt > 0
+                                item.tagged[0].cntt > 0  || item.tagged[0].leadercnt > 0
                                   ? "green"
                                   : "transparent",
                               color: item.record_type == 2 && "red",
@@ -394,77 +385,208 @@ const Warding = () => {
                                 item.fullname
                               )}
                             </div>
-                    
+                            <div style={{ fontStyle: "italic" }}>
+                              {item.address}
+                            </div>
                             <div style={{ fontStyle: "italic" }}>
                               {item.bday + " - " + item.age}
                             </div>
                           </td>
-                          <td  
+                          <td
+                            className="text-center"
                             style={{
                               backgroundColor:
                                 item.tagged[0].cnt > 0 ||
-                                item.tagged[0].cntt > 0 ||
-                                item.tagged[0].leadercnt > 0
+                                item.tagged[0].cntt > 0 || item.tagged[0].leadercnt > 0
+                                  ? "green"
+                                  : "transparent",
+                              color: item.record_type == 2 && "red",
+                            }}
+                          >
+                            {!familyHead ? (
+                              <Button
+                                variant="primary"
+                                onClick={() => handleAddFamilyHead(item)}
+                                disabled={item.tagged[0].cnt > 0 ? true : false}
+                              >
+                                <i className="bi bi-person-add"></i>
+                              </Button>
+                            ) : (
+                              <Button variant="primary" disabled>
+                                <i className="bi bi-person-add"></i>
+                              </Button>
+                            )}
+                          </td>
+                          <td
+                            className="text-center"
+                            style={{
+                              backgroundColor:
+                                item.tagged[0].cnt > 0 ||
+                                item.tagged[0].cntt > 0 || item.tagged[0].leadercnt > 0
+                                  ? "green"
+                                  : "transparent",
+                              color: item.record_type == 2 && "red",
+                            }}
+                          >
+                            <Button
+                              variant="info"
+                              onClick={() => handleAddToMember(item)}
+                              disabled={
+                                item.tagged[0].cnt > 0 ||
+                                item.v_id == (familyHead?.v_id ?? null) ||
+                                clickedItems[item.id] ||
+                                (familyMember?.some(
+                                  (head) => head.v_id === item.v_id
+                                ) ??
+                                  false)
+                                  ? true
+                                  : false
+                              }
+                            >
+                              <i className="bi bi-person-add"></i>
+                            </Button>
+                          </td>
+                          <td className="text-center"  style={{
+                              backgroundColor:
+                                item.tagged[0].cnt > 0 ||
+                                item.tagged[0].cntt > 0  || item.tagged[0].leadercnt > 0
                                   ? "green"
                                   : "transparent",
                               color: item.record_type == 2 && "red",
                             }}>
-                          <div style={{ fontStyle: "italic" }}>
-                              {item.address}
-                            </div>
+                            <CreateTag
+                              id={item.v_id}
+                              tagName="Samuel Laynes (Survey 2025)"
+                              tagTooltip="SL"
+                              tagId="660"
+                              userId={userId}
+                            />
+
+                            <CreateTag
+                              id={item.v_id}
+                              tagName="Leo Rodriguez (Survey 2025)"
+                              tagTooltip="LR"
+                              tagId="661"
+                              userId={userId}
+                            />
+
+                            <CreateTag
+                              id={item.v_id}
+                              tagName="Jan Alberto (Survey 2025)"
+                              tagTooltip="JA"
+                              tagId="678"
+                              userId={userId}
+                            />
+
+                            <CreateTag
+                              id={item.v_id}
+                              tagName="UndecidedCong(Survey 2025)"
+                              tagTooltip="UD"
+                              tagId="679"
+                              userId={userId}
+                            />
+
+                            {/* <NewTag id={item.v_id} /> */}
                           </td>
-                          <td
-                            className="text-center"
-                            style={{
+                          <td className="text-center"  style={{
                               backgroundColor:
                                 item.tagged[0].cnt > 0 ||
-                                item.tagged[0].cntt > 0 ||
-                                item.tagged[0].leadercnt > 0
+                                item.tagged[0].cntt > 0  || item.tagged[0].leadercnt > 0
                                   ? "green"
                                   : "transparent",
                               color: item.record_type == 2 && "red",
-                            }}
-                          >
-                           {!familyHead ? (
-                              <Button
-                                variant="primary"
-                                className="w-100"
-                                onClick={() => handleAddFamilyHead(item)}
-                                disabled={item.tagged[0].cnt > 0 || item.tagged[0].cntt > 0 ? true : false || item.record_type == 2 ? true : false}
-                              >
-                                <i className="bi bi-person-add"></i> Head
-                              </Button>
-                            ) : (
-                              <Button variant="primary" disabled>
-                                <i className="bi bi-person-add"></i> Head
-                              </Button>
-                            )}
+                            }}>
+                            <CreateTag
+                              id={item.v_id}
+                              tagName="BossTe(Survey 2025)"
+                              tagTooltip="PC"
+                              tagId="662"
+                              userId={userId}
+                            />
+
+                            <CreateTag
+                              id={item.v_id}
+                              tagName="Asanza(Survey 2025)"
+                              tagTooltip="PA"
+                              tagId="663"
+                              userId={userId}
+                            />
+
+                            <CreateTag
+                              id={item.v_id}
+                              tagName="UndecidedGov(Survey 2025)"
+                              tagTooltip="UD"
+                              tagId="680"
+                              userId={userId}
+                            />
+
+                            {/* <NewTag id={item.v_id} /> */}
                           </td>
-                        
-                          <td
-                            className="text-center"
-                            style={{
+                          <td className="text-center"  style={{
                               backgroundColor:
                                 item.tagged[0].cnt > 0 ||
-                                item.tagged[0].cntt > 0 ||
-                                item.tagged[0].leadercnt > 0
+                                item.tagged[0].cntt > 0  || item.tagged[0].leadercnt > 0
                                   ? "green"
                                   : "transparent",
                               color: item.record_type == 2 && "red",
-                            }}
-                          >
-                         <Button
-                              variant="info"
-                              className="w-100"
-                              onClick={() => handleAddToMember(item)}
-                              disabled={item.tagged[0].cnt > 0 || item.tagged[0].cntt > 0 || clickedItems[item.id]  ? true : false ||  (familyMember?.some((head) => head.v_id === item.v_id) ??false) || item.record_type == 2 ? true : false}
-                            >
-                              <i className="bi bi-person-add"></i> Member
-                            </Button>
+                            }}>
+                            <CreateTag
+                              id={item.v_id}
+                              tagName="Fernandez(Survey 2025)"
+                              tagTooltip="OF"
+                              tagId="676"
+                              userId={userId}
+                            />
+
+                            <CreateTag
+                              id={item.v_id}
+                              tagName="Abundo(Survey 2025)"
+                              tagTooltip="SA"
+                              tagId="677"
+                              userId={userId}
+                            />
+
+                            <CreateTag
+                              id={item.v_id}
+                              tagName="UndecidedVGov(Survey 2025)"
+                              tagTooltip="UD"
+                              tagId="681"
+                              userId={userId}
+                            />
+
+                            {/* <NewTag id={item.v_id} /> */}
                           </td>
-                          <td>
-                            <HouseholdWardingTags
-                              leader={item}
+
+                          <td className="text-center"  style={{
+                              backgroundColor:
+                                item.tagged[0].cnt > 0 ||
+                                item.tagged[0].cntt > 0  || item.tagged[0].leadercnt > 0
+                                  ? "green"
+                                  : "transparent",
+                              color: item.record_type == 2 && "red",
+                            }}>
+                            <CreateTag
+                              id={item.v_id}
+                              tagName="Outside Province(Household Warding)"
+                              tagTooltip="OP"
+                              tagId="626"
+                              userId={userId}
+                            />
+                          </td>
+
+                          <td className="text-center"  style={{
+                              backgroundColor:
+                                item.tagged[0].cnt > 0 ||
+                                item.tagged[0].cntt > 0  || item.tagged[0].leadercnt > 0
+                                  ? "green"
+                                  : "transparent",
+                              color: item.record_type == 2 && "red",
+                            }}>
+                            <CreateTag
+                              id={item.v_id}
+                              tagName="Needs Assistance(Household Warding)"
+                              tagTooltip="NA"
+                              tagId="682"
                               userId={userId}
                             />
                           </td>
@@ -602,7 +724,7 @@ const Warding = () => {
                             borderBottom: "1px solid #ccc",
                           }}
                         >
-                                              {item.fullname} [{item.v_barangay}]
+                          {item.fullname}
                         </div>
                       ))}
                     </div>

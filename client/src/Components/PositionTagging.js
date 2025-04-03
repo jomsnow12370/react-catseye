@@ -18,7 +18,7 @@ const Position2025Section = ({ leader, userId }) => {
         onClick={toggleSection}
         id={`position-button-${leader.v_id}`}
       >
-        <span><strong>Position 2025</strong></span>
+        <span><strong>Tags</strong></span>
         <i className={`bi ${isOpen ? 'bi-chevron-up' : 'bi-chevron-down'}`}></i>
       </Button>
       
@@ -74,11 +74,12 @@ const Position2025Section = ({ leader, userId }) => {
                 tagTooltip="SKC"
                 tagId="689"
                 userId={userId}
+
               />
               <CreateTag
                 id={leader.v_id}
                 tagName="Barangay Secretary 2025"
-                tagTooltip="SL"
+                tagTooltip="BS"
                 tagId="690"
                 userId={userId}
               />

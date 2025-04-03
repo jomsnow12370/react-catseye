@@ -24,7 +24,7 @@ const GetLeader = (props) => {
         <span>
           <h5 style={{fontSize: "small"}}>
             <React.Fragment key={key}>
-              {GetType(item.type)} {item.electionyear}{" "} 
+              {GetType(item.type)} {item.electionyear}{" "}
             </React.Fragment>
           </h5>
         </span>
