@@ -111,7 +111,6 @@ const Warding = () => {
     return () => clearTimeout(delayDebounceFn);
   }, [leaderSearchQuery]);
 
-  
   const handleLeaderSearch = async (query) => {
     setIsLeaderSearching(true);
     var mun = municipality;
@@ -339,26 +338,31 @@ const Warding = () => {
                       <th>Address</th>
                       <th className="text-center">Family Head</th>
                       <th className="text-center">Family Member</th>
-                      <th className="text-center" width="400px">Tags</th>
+                      <th className="text-center" width="400px">
+                        Tags
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
                     {!isPending ? (
                       voters.map((item, index) => (
                         <tr
-                        key={item.v_id}
-                        data-toggle="tooltip"
-                        title={
-                          item.tagged[0].leadercnt > 0 &&  item.tagged[0].cnt == 0 && item.tagged[0].cntt == 0
+                          key={item.v_id}
+                          data-toggle="tooltip"
+                          title={
+                            item.tagged[0].leadercnt > 0 &&
+                            item.tagged[0].cnt == 0 &&
+                            item.tagged[0].cntt == 0
                               ? "Leader"
-                              : item.tagged[0].cnt > 0 || item.tagged[0].cntt > 0
+                              : item.tagged[0].cnt > 0 ||
+                                item.tagged[0].cntt > 0
                               ? "Household member of: " +
                                 item.tagged[0].fhfullname +
                                 " recorded by: " +
                                 item.tagged[0].username
                               : "NO WARDING RECORD"
-                      }
-                      >
+                          }
+                        >
                           <td
                             width={30}
                             className="text-center"
@@ -394,12 +398,11 @@ const Warding = () => {
                                 item.fullname
                               )}
                             </div>
-                    
                             <div style={{ fontStyle: "italic" }}>
                               {item.bday + " - " + item.age}
                             </div>
                           </td>
-                          <td  
+                          <td
                             style={{
                               backgroundColor:
                                 item.tagged[0].cnt > 0 ||
@@ -408,8 +411,9 @@ const Warding = () => {
                                   ? "green"
                                   : "transparent",
                               color: item.record_type == 2 && "red",
-                            }}>
-                          <div style={{ fontStyle: "italic" }}>
+                            }}
+                          >
+                            <div style={{ fontStyle: "italic" }}>
                               {item.address}
                             </div>
                           </td>
@@ -425,12 +429,19 @@ const Warding = () => {
                               color: item.record_type == 2 && "red",
                             }}
                           >
-                           {!familyHead ? (
+                            {!familyHead ? (
                               <Button
                                 variant="primary"
                                 className="w-100"
                                 onClick={() => handleAddFamilyHead(item)}
-                                disabled={item.tagged[0].cnt > 0 || item.tagged[0].cntt > 0 ? true : false || item.record_type == 2 ? true : false}
+                                disabled={
+                                  item.tagged[0].cnt > 0 ||
+                                  item.tagged[0].cntt > 0
+                                    ? true
+                                    : false || item.record_type == 2
+                                    ? true
+                                    : false
+                                }
                               >
                                 <i className="bi bi-person-add"></i> Head
                               </Button>
@@ -440,7 +451,7 @@ const Warding = () => {
                               </Button>
                             )}
                           </td>
-                        
+
                           <td
                             className="text-center"
                             style={{
@@ -453,11 +464,24 @@ const Warding = () => {
                               color: item.record_type == 2 && "red",
                             }}
                           >
-                         <Button
+                            <Button
                               variant="info"
                               className="w-100"
                               onClick={() => handleAddToMember(item)}
-                              disabled={item.tagged[0].cnt > 0 || item.tagged[0].cntt > 0 || clickedItems[item.id]  ? true : false ||  (familyMember?.some((head) => head.v_id === item.v_id) ??false) || item.record_type == 2 ? true : false}
+                              disabled={
+                                item.tagged[0].cnt > 0 ||
+                                item.tagged[0].cntt > 0 ||
+                                clickedItems[item.id]
+                                  ? true
+                                  : false ||
+                                    (familyMember?.some(
+                                      (head) => head.v_id === item.v_id
+                                    ) ??
+                                      false) ||
+                                    item.record_type == 2
+                                  ? true
+                                  : false
+                              }
                             >
                               <i className="bi bi-person-add"></i> Member
                             </Button>
@@ -466,6 +490,7 @@ const Warding = () => {
                             <HouseholdWardingTags
                               leader={item}
                               userId={userId}
+                              mun={municipality}
                             />
                           </td>
                         </tr>
@@ -602,7 +627,7 @@ const Warding = () => {
                             borderBottom: "1px solid #ccc",
                           }}
                         >
-                                              {item.fullname} [{item.v_barangay}]
+                          {item.fullname} [{item.v_barangay}]
                         </div>
                       ))}
                     </div>

@@ -51,23 +51,23 @@ const WardingList = () => {
   const [leaders, setLeaders] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
 
- // Filter households based on the search query
- // Filter households based on the search query
-const filteredHouseholds = households.filter((family) => {
-  // Check if family head name matches search query
-  const fhMatches =
-    family.fh?.toLowerCase().includes(searchQuery.toLowerCase()) || false;
+  // Filter households based on the search query
+  // Filter households based on the search query
+  const filteredHouseholds = households.filter((family) => {
+    // Check if family head name matches search query
+    const fhMatches =
+      family.fh?.toLowerCase().includes(searchQuery.toLowerCase()) || false;
 
-  // Check if any family member's name matches search query, handling empty or undefined members
-  const memberMatches = Array.isArray(family.members)
-    ? family.members.some((member) =>
-        member.fullname?.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : false;
+    // Check if any family member's name matches search query, handling empty or undefined members
+    const memberMatches = Array.isArray(family.members)
+      ? family.members.some((member) =>
+          member.fullname?.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      : false;
 
-  // Return true if either the family head or any member matches
-  return fhMatches || memberMatches;
-});
+    // Return true if either the family head or any member matches
+    return fhMatches || memberMatches;
+  });
 
   const handleMunicipalityChange = (event) => {
     const selectedMunicipality = event.target.value;
@@ -540,6 +540,7 @@ const filteredHouseholds = households.filter((family) => {
                                                 <HouseholdWardingTags
                                                   leader={member}
                                                   userId={userId}
+                                                  mun={municipality}
                                                 />
                                               </td>
                                             </tr>

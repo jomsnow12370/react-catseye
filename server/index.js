@@ -425,6 +425,7 @@ app.get("/getleadersreport", async (req, res) => {
   }
 });
 
+
 // app.get("/getleadersreport", (req, res) => {
 //   var mun = req.query.mun;
 //   var brgy = req.query.brgy;
@@ -818,11 +819,12 @@ app.post("/deleteTag", async (req, res) => {
   });
 });
 
+
 app.delete("/deleteCreatedTag", (req, res) => {
   const tagid = req.query.tagid; // ID of the tag to delete
-  const uid = req.query.uid; // User ID (optional, for logging)
-  const vid = req.query.id; // Record or voter ID
-  const txt = req.query.txt; // Optional text parameter
+  const uid = req.query.uid;       // User ID (optional, for logging)
+  const vid = req.query.id;        // Record or voter ID
+  const txt = req.query.txt;       // Optional text parameter
 
   // Validate required parameters
   if (!tagid || !vid) {
@@ -842,14 +844,14 @@ app.delete("/deleteCreatedTag", (req, res) => {
   });
 });
 
+
 // Login route
 app.get("/login", (req, res) => {
   const userName = req.query.userName;
   const password = req.query.password;
 
-  const query =
-    "SELECT user_id, fname, user_type FROM userstbl WHERE username = ? AND password = ?";
-
+  const query = "SELECT user_id, fname, user_type FROM userstbl WHERE username = ? AND password = ?";
+  
   db.query(query, [userName, password], (error, results) => {
     if (error) {
       console.error("Database error:", error);
@@ -864,6 +866,7 @@ app.get("/login", (req, res) => {
     res.json(user); // Send user data
   });
 });
+
 
 // Logout route
 app.get("/logout", (req, res) => {
@@ -1231,8 +1234,8 @@ app.get("/searchVoter", async (req, res) => {
   if (name.includes("facebook")) {
     function getLastPartOfURL(url) {
       // Split the URL by '/' and return the last non-empty part
-      return url.split("/").filter(Boolean).pop();
-    }
+      return url.split('/').filter(Boolean).pop();
+  }
     // console.log("facebook search");
     try {
       // Prepare combinations of name arrangements
@@ -1260,6 +1263,7 @@ LIMIT ${limit};
         });
       });
 
+     
       let votersArr = [];
 
       const promises = results.map(async (result) => {
@@ -1552,7 +1556,7 @@ app.get("/searchVoterNewLeader", async (req, res) => {
         record_type: record_type,
         age: age,
         precinct: precinct,
-        leaderHistory: leaderHistory,
+        leaderHistory: leaderHistory
       });
     });
 
@@ -1586,7 +1590,7 @@ app.get("/search", async (req, res) => {
 
   try {
     const sql =
-      "SELECT v_info.v_id as id, v_idx, CONCAT(v_lname, ' ', v_fname, ' ', v_mname) as fullname, CONCAT(barangay, ', ', municipality) as address, DATE_FORMAT(v_birthday, '%b. %d, %Y') as v_birthday, record_type, TIMESTAMPDIFF(YEAR, v_birthday, CURDATE()) AS age, v_precinct_no from v_info INNER JOIN barangays ON barangays.id = v_info.barangayId WHERE (CONCAT(v_info.v_lname,' ',v_info.v_fname,' ',v_info.v_mname) like '%" +
+      "SELECT v_info.v_id as id, v_idx, CONCAT_WS(' ', v_lname, v_fname, v_mname) as fullname, CONCAT(barangay, ', ', municipality) as address, DATE_FORMAT(v_birthday, '%b. %d, %Y') as v_birthday, record_type, TIMESTAMPDIFF(YEAR, v_birthday, CURDATE()) AS age, v_precinct_no from v_info INNER JOIN barangays ON barangays.id = v_info.barangayId WHERE (CONCAT(v_info.v_lname,' ',v_info.v_fname,' ',v_info.v_mname) like '%" +
       name +
       "%' OR CONCAT(v_fname, ' ', v_lname) like '%" +
       name +
@@ -1600,14 +1604,15 @@ app.get("/search", async (req, res) => {
       name +
       "%' OR CONCAT(v_mname, ' ', v_fname) like '%" +
       name +
-      "%') AND municipality LIKE '%" +
+      "%') AND municipality ='" +
       mun +
-      "%' AND barangay LIKE '%" +
+      "' AND barangay = '" +
       brgy +
-      "%' ORDER BY municipality, barangay, v_lname, v_mname, v_fname LIMIT 3000";
+      "' ORDER BY municipality, barangay, v_lname, v_mname, v_fname LIMIT 3000";
 
     const results = await new Promise((resolve, reject) => {
       db.query(sql, (error, results) => {
+        console.log(sql);
         if (error) {
           reject(error);
         } else {
@@ -1627,15 +1632,13 @@ app.get("/search", async (req, res) => {
       const record_type = result.record_type;
       const precinct = result.v_precinct_no;
       const v_idx = result.v_idx;
-
+    
       const taggedSql =
         "SELECT  COUNT(*) AS cnt,(SELECT COUNT(*) FROM head_household WHERE fh_v_id = '" +
         v_id +
         "') AS cntt, (SELECT user_id FROM head_household  WHERE fh_v_id = '" +
         v_id +
-        "' LIMIT 1) AS uid2, CONCAT(v_lname, ', ', v_fname, ' ', v_mname) AS fhfullname,   user_id AS uid,    (SELECT  username  FROM userstbl  WHERE(user_id = uid OR user_id = uid2)) AS username, (SELECT COUNT(*) FROM leaders WHERE v_id = '" +
-        v_id +
-        "' and electionyear = 2025 and status is null) AS leadercnt FROM household_warding INNER JOIN v_info ON v_info.v_id = household_warding.fh_v_id INNER JOIN barangays ON barangays.id = v_info.barangayId WHERE(mem_v_id = '" +
+        "' LIMIT 1) AS uid2, CONCAT(v_lname, ', ', v_fname, ' ', v_mname) AS fhfullname,   user_id AS uid,    (SELECT  username  FROM userstbl  WHERE(user_id = uid OR user_id = uid2)   LIMIT 1) AS username, (SELECT COUNT(*) FROM leaders WHERE v_id = '" + v_id + "' and electionyear = 2025 and status is null) AS leadercnt FROM household_warding INNER JOIN v_info ON v_info.v_id = household_warding.fh_v_id INNER JOIN barangays ON barangays.id = v_info.barangayId WHERE(mem_v_id = '" +
         v_id +
         "' OR fh_v_id = '" +
         v_id +
@@ -1891,6 +1894,7 @@ app.get("/userTags", (req, res) => {
 });
 
 app.get("/status", (req, res, next) => res.sendStatus(200));
+
 
 app.post("/saveProfilepic", (req, res) => {
   try {
@@ -2243,7 +2247,6 @@ app.post("/deleteLeader", (req, res) => {
     res.send(result);
   });
 });
-
 app.get("/getHouseholds", async (req, res) => {
   const datestring = getCurrentDate();
   var datefrom = datestring.date;
@@ -2254,13 +2257,13 @@ app.get("/getHouseholds", async (req, res) => {
 
   try {
     const sql =
-      "SELECT fh_v_id, CONCAT(v_lname, ', ', v_fname, ' ', v_mname) as fullname, leader_v_id, purok_st, (SELECT remarks_txt from v_remarks INNER JOIN quick_remarks ON quick_remarks.remarks_id = v_remarks.remarks_id WHERE category_id = '55' and v_id = fh_v_id ORDER BY v_remarks_id DESC LIMIT 1) as cong, (SELECT remarks_txt from v_remarks INNER JOIN quick_remarks ON quick_remarks.remarks_id = v_remarks.remarks_id WHERE category_id = '56' and v_id = fh_v_id ORDER BY v_remarks_id DESC LIMIT 1) as gov from head_household INNER JOIN v_info ON v_info.v_id = head_household.fh_v_id INNER JOIN barangays ON barangays.id = v_info.barangayId WHERE user_id = '" +
+      "SELECT fh_v_id, CONCAT_WS(' ', v_lname, v_fname, v_mname) as fullname, leader_v_id, purok_st, (SELECT remarks_txt from v_remarks INNER JOIN quick_remarks ON quick_remarks.remarks_id = v_remarks.remarks_id WHERE category_id = '55' and v_id = fh_v_id ORDER BY v_remarks_id DESC LIMIT 1) as cong, (SELECT remarks_txt from v_remarks INNER JOIN quick_remarks ON quick_remarks.remarks_id = v_remarks.remarks_id WHERE category_id = '56' and v_id = fh_v_id ORDER BY v_remarks_id DESC LIMIT 1) as gov from head_household INNER JOIN v_info ON v_info.v_id = head_household.fh_v_id INNER JOIN barangays ON barangays.id = v_info.barangayId WHERE user_id = '" +
       userid +
       "' AND municipality = '" +
       municipality +
       "' AND barangay = '" +
       barangay +
-      "' ORDER BY head_household.id DESC";
+      "'  GROUP BY head_household.fh_v_id ORDER BY head_household.id DESC";
     const results = await new Promise((resolve, reject) => {
       db.query(sql, (error, results) => {
         if (error) {
@@ -2271,16 +2274,17 @@ app.get("/getHouseholds", async (req, res) => {
       });
     });
 
-    let houseHoldArr = [];
+    // Create array with predetermined size to maintain order
+    let houseHoldArr = new Array(results.length);
 
-    const promises = results.map(async (result) => {
+    const promises = results.map(async (result, index) => {
       const v_id = result.fh_v_id;
       const fhfullname = result.fullname;
       const leaderid = result.leader_v_id;
       const purok_st = result.purok_st;
 
       const leaderSql =
-        "SELECT v_info.v_id as vid, CONCAT(v_lname, ', ', v_fname, ' ', v_mname) as fullname from leaders INNER JOIN v_info ON v_info.v_id = leaders.v_id WHERE leaders.v_id = '" +
+        "SELECT v_info.v_id as vid, CONCAT_WS(' ',v_lname, v_fname, v_mname) as fullname from leaders INNER JOIN v_info ON v_info.v_id = leaders.v_id WHERE leaders.v_id = '" +
         leaderid +
         "'";
       const leader = await new Promise((resolve, reject) => {
@@ -2294,7 +2298,7 @@ app.get("/getHouseholds", async (req, res) => {
       });
 
       const memberSql =
-        "SELECT v_info.v_id, v_info.v_id as vid, CONCAT(v_lname, ', ', v_fname, ' ', v_mname) as fullname, municipality, barangay, mem_v_id, (SELECT remarks_txt from v_remarks INNER JOIN quick_remarks ON quick_remarks.remarks_id = v_remarks.remarks_id WHERE category_id = '55' and v_id = vid ORDER BY v_remarks_id DESC LIMIT 1) as cong, (SELECT remarks_txt from v_remarks INNER JOIN quick_remarks ON quick_remarks.remarks_id = v_remarks.remarks_id WHERE category_id = '56' and v_id = vid ORDER BY v_remarks_id DESC LIMIT 1) as gov, (SELECT remarks_txt from v_remarks INNER JOIN quick_remarks ON quick_remarks.remarks_id = v_remarks.remarks_id WHERE category_id = '57' and v_id = vid ORDER BY v_remarks_id DESC LIMIT 1) as vgov from household_warding INNER JOIN v_info ON v_info.v_id = mem_v_id INNER JOIN barangays ON barangays.id = v_info.barangayId WHERE fh_v_id = '" +
+        "SELECT v_info.v_id as vid, v_info.v_id, CONCAT_WS(' ',v_lname, v_fname, v_mname) as fullname, municipality, barangay, mem_v_id, (SELECT remarks_txt from v_remarks INNER JOIN quick_remarks ON quick_remarks.remarks_id = v_remarks.remarks_id WHERE category_id = '55' and v_id = vid ORDER BY v_remarks_id DESC LIMIT 1) as cong, (SELECT remarks_txt from v_remarks INNER JOIN quick_remarks ON quick_remarks.remarks_id = v_remarks.remarks_id WHERE category_id = '56' and v_id = vid ORDER BY v_remarks_id DESC LIMIT 1) as gov, (SELECT remarks_txt from v_remarks INNER JOIN quick_remarks ON quick_remarks.remarks_id = v_remarks.remarks_id WHERE category_id = '57' and v_id = vid ORDER BY v_remarks_id DESC LIMIT 1) as vgov from household_warding INNER JOIN v_info ON v_info.v_id = mem_v_id INNER JOIN barangays ON barangays.id = v_info.barangayId WHERE fh_v_id = '" +
         v_id +
         "' ORDER BY household_warding.id ASC";
       const members = await new Promise((resolve, reject) => {
@@ -2307,18 +2311,22 @@ app.get("/getHouseholds", async (req, res) => {
         });
       });
 
-      houseHoldArr.push({
+      // Assign to specific index instead of pushing
+      houseHoldArr[index] = {
         fh: fhfullname,
         fhid: v_id,
         leaderid: leaderid,
         leader: leader,
         members: members,
         purok_st: purok_st,
-      });
+      };
     });
 
     await Promise.all(promises);
 
+    // Remove any undefined elements (in case of errors with specific promises)
+    houseHoldArr = houseHoldArr.filter(item => item !== undefined);
+    
     res.send(houseHoldArr);
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -2366,7 +2374,7 @@ app.post("/saveHouseHold", async (req, res) => {
 
   const datestring = getCurrentDate();
   var datenow = datestring.date + " " + datestring.time;
-  console.log(leader);
+  console.log(leader)
   // Example logic to handle the data (save to database, etc.)
   try {
     const query =
@@ -2491,6 +2499,7 @@ app.post("/updatePurok", async (req, res) => {
   }
 });
 
+
 app.post("/updateHouseholdHead", async (req, res) => {
   const { userid } = req.query; // Retrieve query parameter if needed
   const { currentFhid, newFhid } = req.query; // Destructure data from request body
@@ -2499,7 +2508,7 @@ app.post("/updateHouseholdHead", async (req, res) => {
   const datenow = `${datestring.date} ${datestring.time}`;
 
   try {
-    // Update query to modify the purok_st based on fhid
+       // Update query to modify the purok_st based on fhid
     const query = `UPDATE head_household SET fh_v_id = ? WHERE fh_v_id = ? `;
     db.query(query, [newFhid, currentFhid], (err, result) => {
       if (err) {
@@ -2507,13 +2516,12 @@ app.post("/updateHouseholdHead", async (req, res) => {
         return res.status(500).json({ error: "Failed to update record" });
       }
 
+      
       const query3 = `UPDATE household_warding SET fh_v_id = ? WHERE fh_v_id = ?`;
       db.query(query3, [newFhid, currentFhid], (err, result3) => {
         if (err) {
           console.error("Database error (members update):", err);
-          return res
-            .status(500)
-            .json({ error: "Failed to update household members" });
+          return res.status(500).json({ error: "Failed to update household members" });
         }
       });
     });
@@ -2523,6 +2531,7 @@ app.post("/updateHouseholdHead", async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 });
+
 
 app.post("/saveLeader", async (req, res) => {
   // const { vid, userId } = req.body; // Access data from request body
@@ -2667,7 +2676,7 @@ app.get("/searchMember", (req, res) => {
   try {
     if (text !== "") {
       const sql =
-        "SELECT CONCAT(v_lname, ', ', v_fname, ' ', v_mname) as fullname, municipality, barangay, v_id, (SELECT COUNT(*) from household_warding WHERE (fh_v_id = v_id OR mem_v_id = v_id)) as cnt, (SELECT COUNT(*) from head_household WHERE fh_v_id = v_id) as cnt2 from v_info INNER JOIN barangays ON barangays.id = v_info.barangayId WHERE (CONCAT(v_info.v_lname,' ',v_info.v_fname,' ',v_info.v_mname) like '%" +
+        "SELECT CONCAT_WS(' ', v_lname, ' ', v_fname, ' ', v_mname) as fullname, municipality, barangay, v_id, (SELECT COUNT(*) from household_warding WHERE (fh_v_id = v_id OR mem_v_id = v_id)) as cnt, (SELECT COUNT(*) from head_household WHERE fh_v_id = v_id) as cnt2 from v_info INNER JOIN barangays ON barangays.id = v_info.barangayId WHERE (CONCAT(v_info.v_lname,' ',v_info.v_fname,' ',v_info.v_mname) like '%" +
         text +
         "%' OR CONCAT(v_fname, ' ', v_lname) like '%" +
         text +
@@ -2697,6 +2706,7 @@ app.get("/searchMember", (req, res) => {
   // console.log(text);
 });
 
+
 app.get("/searchLeader", (req, res) => {
   const text = req.query.text;
   const mun = req.query.mun;
@@ -2717,7 +2727,7 @@ app.get("/searchLeader", (req, res) => {
   try {
     if (text !== "") {
       const sql =
-        "SELECT CONCAT(v_lname, ', ', v_fname, ' ', v_mname) as fullname, municipality as v_municipality, barangay as v_barangay, v_info.v_id from v_info INNER JOIN leaders ON leaders.v_id = v_info.v_id INNER JOIN barangays ON barangays.id = v_info.barangayId WHERE  (CONCAT(v_info.v_lname,' ',v_info.v_fname,' ',v_info.v_mname) like '%" +
+        "SELECT CONCAT_WS(' ', v_lname, v_fname, v_mname) as fullname, municipality as v_municipality, barangay as v_barangay, v_info.v_id from v_info INNER JOIN leaders ON leaders.v_id = v_info.v_id INNER JOIN barangays ON barangays.id = v_info.barangayId WHERE  (CONCAT(v_info.v_lname,' ',v_info.v_fname,' ',v_info.v_mname) like '%" +
         text +
         "%' OR CONCAT(v_fname, ' ', v_lname) like '%" +
         text +
@@ -2731,11 +2741,7 @@ app.get("/searchLeader", (req, res) => {
         text +
         "%' OR CONCAT(v_mname, ' ', v_fname) like '%" +
         text +
-        "%')" +
-        munquery +
-        " " +
-        brgyquery +
-        " AND record_type = 1 AND electionyear = '2025' and leaders.status is null GROUP BY leaders.v_id ORDER BY municipality, barangay, v_lname LIMIT 100";
+        "%')" + munquery + " " + brgyquery +" AND record_type = 1 AND electionyear = '2025' and leaders.status is null GROUP BY leaders.v_id ORDER BY municipality, barangay, v_lname LIMIT 100";
       db.query(sql, (error, result) => {
         console.log(sql);
         res.send(result);
@@ -2747,6 +2753,7 @@ app.get("/searchLeader", (req, res) => {
   }
   // console.log(text);
 });
+
 
 app.get("/rename-folders", (req, res) => {
   const baseFolder = path.join(__dirname, "./public/uploads/");
@@ -3283,91 +3290,6 @@ app.get("/getLeadersRegistration", (req, res) => {
   }
 });
 
-app.get("/getIncRegistration", (req, res) => {
-  var mun = req.query.municipality;
-  var brgy = req.query.barangay;
-
-  const datestring = getCurrentDate();
-  const datenow = `${datestring.date}`;
-
-  let brgyquery = "";
-  if (brgy && brgy !== "") {
-    brgyquery = ` AND barangay = '${brgy}' `;
-  }
-
-  try {
-    // Updated query to include leader's profile photo
-    const sql = `
-      SELECT 
-    barangay, 
-    municipality, 
-    v_fname, 
-    v_mname, 
-    v_lname, 
-    record_type, 
-    v_info.v_id as vid,
-    v_info.v_id,
-    -- Combining remarks_id and remarks_txt into one string
-    (SELECT v_remarks.remarks_id
-     FROM v_remarks 
-     INNER JOIN quick_remarks 
-       ON v_remarks.remarks_id = quick_remarks.remarks_id 
-     WHERE category_id = 199 AND v_remarks.v_id = vid
-     LIMIT 1) as type,
-    -- Get the latest profile image for the leader
-    (SELECT imgname 
-     FROM v_imgtbl 
-     WHERE v_id = v_info.v_id 
-       AND (v_imgtbl.type IS NULL OR v_imgtbl.type = 1) 
-     ORDER BY id DESC 
-     LIMIT 1) AS profile_photo,
-    -- Count of images with type = 3
-    (SELECT COUNT(*) 
-     FROM v_imgtbl 
-     WHERE v_id = vid 
-       AND v_imgtbl.type = 3) AS signature,
-    -- Attendance status
-    (SELECT attendance_status 
-     FROM leader_registrations 
-     WHERE leader_id = v_info.v_id 
-       AND date_registered LIKE '%${datenow}%' 
-     LIMIT 1) AS attendance_status
-FROM 
-    v_info
-INNER JOIN 
-    barangays 
-    ON barangays.id = v_info.barangayId 
-WHERE 
-    municipality = '${mun}' 
-    ${brgyquery}
-  AND record_type = 1
-ORDER BY 
-    barangayId, v_lname, v_mname ASC;
-`;
-
-    db.query(sql, (error, result) => {
-      if (error) {
-        console.error("Error fetching data:", error);
-        res.status(500).json({ message: "Internal Server Error" });
-        return;
-      }
-      // Modify result to include the full path for the profile image
-      const updatedResult = result.map((leader) => {
-        // Assuming photos are stored in '/profiles/{leaderId}/{imgName}'
-        const photoPath = leader.profile_photo
-          ? `${leader.v_id}/${leader.profile_photo}`
-          : `userprofiles/k.jpg`; // Default photo if no profile photo exists
-        return { ...leader, photo: photoPath }; // Add photo path to each leader
-      });
-      console.log(updatedResult);
-      res.send(updatedResult); // Send the updated leaders list with photo paths
-    });
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-});
-
 app.post("/uploadPhoto", (req, res) => {
   const id = req.query.id;
   const uid = req.query.userid;
@@ -3437,7 +3359,6 @@ app.post("/uploadSignature", (req, res) => {
 
     try {
       await db.query(query);
-      console.log(query);
       res.status(200).json({
         message: "Signature uploaded successfully",
         fileName: filename,
@@ -3470,30 +3391,6 @@ app.post("/markAttendance", async (req, res) => {
     }
   } catch (error) {
     console.error("Error marking attendance:", error);
-    res.status(500).json({ message: "Internal server error." });
-  }
-});
-
-app.post("/updateHouseholdLeader", async (req, res) => {
-  // If you expect the data in the request body, use req.body
-  const { fhid, leaderid } = req.query;
-
-  try {
-    const query = `UPDATE head_household SET leader_v_id = ? WHERE fh_v_id = ?`;
-
-    // Pass leaderid first then fhid.
-    const result = await db.query(query, [leaderid, fhid]);
-
-    // Check if any rows were updated
-    if (result && result.affectedRows > 0) {
-      res
-        .status(200)
-        .json({ message: "Household leader updated successfully." });
-    } else {
-      res.status(400).json({ message: "Failed to update household leader." });
-    }
-  } catch (error) {
-    console.error("Error updating household leader:", error);
     res.status(500).json({ message: "Internal server error." });
   }
 });
@@ -3568,6 +3465,8 @@ app.delete("/deletePhoneNumber", async (req, res) => {
   }
 });
 
+
+
 app.get("/getleadersliquidation", (req, res) => {
   var mun = req.query.mun;
   var brgy = req.query.brgy;
@@ -3583,6 +3482,11 @@ app.get("/getleadersliquidation", (req, res) => {
     timequery = ` AND TIME(leader_registrations.date_registered) BETWEEN '${timeFrom}' AND '${timeTo}' `;
   }
 
+  let datequery = "";
+  if (date !== "") {
+    datequery = ` AND DATE(leader_registrations.date_registered) = '${date}' `;
+  }
+
   // console.log(mun);
   // console.log(brgy);`
   // console.log(date);
@@ -3590,35 +3494,35 @@ app.get("/getleadersliquidation", (req, res) => {
   try {
     // Updated query to include leader's profile photo
     // const sql = `
-    //   SELECT
-    //     barangay,
-    //     municipality,
-    //     v_fname,
-    //     v_mname,
-    //     v_lname,
-    //     leaders.type,
-    //     record_type,
+    //   SELECT 
+    //     barangay, 
+    //     municipality, 
+    //     v_fname, 
+    //     v_mname, 
+    //     v_lname, 
+    //     leaders.type, 
+    //     record_type, 
     //     v_info.v_id,
     //    imgname,
     //    TIME(leader_registrations.date_registered) as attendance_date
-    //   FROM
-    //     v_list.leaders
-    //   INNER JOIN
-    //     v_info ON v_info.v_id = leaders.v_id
-    //   INNER JOIN
-    //     barangays ON barangays.id = v_info.barangayId
+    //   FROM 
+    //     v_list.leaders 
+    //   INNER JOIN 
+    //     v_info ON v_info.v_id = leaders.v_id 
+    //   INNER JOIN 
+    //     barangays ON barangays.id = v_info.barangayId 
     //     INNER JOIN
     //     v_imgtbl ON v_imgtbl.v_id = leaders.v_id
-    //     INNER JOIN
+    //     INNER JOIN 
     //     leader_registrations ON leader_registrations.leader_id = leaders.v_id
-    //   WHERE
+    //   WHERE 
     //     municipality = '${mun}' and barangay = '${brgy}'
-    //     AND status IS NULL
+    //     AND status IS NULL 
     //     AND electionyear = 2025
-    // AND v_imgtbl.type = 3
+		// AND v_imgtbl.type = 3
     //     AND DATE(leader_registrations.date_registered) = '${date}'
     //     GROUP BY leaders.v_id
-    //   ORDER BY
+    //   ORDER BY 
     //     leaders.type DESC, v_lname, v_mname ASC`;
     const sql = `
     SELECT 
@@ -3648,8 +3552,9 @@ app.get("/getleadersliquidation", (req, res) => {
       AND status IS NULL 
       AND electionyear = 2025
   AND v_imgtbl.type = 3
-      AND DATE(leader_registrations.date_registered) = '${date}'
+    ${datequery}
    ${timequery}
+   AND DATE(date_registered) <> '2025-03-05'
       GROUP BY leaders.v_id
     ORDER BY 
       leaders.type DESC, v_lname, v_mname ASC`;
@@ -3669,6 +3574,136 @@ app.get("/getleadersliquidation", (req, res) => {
   }
 });
 
+app.get("/get-survey-warding-head-of-household", (req, res) => {
+  // Query to get household data with congregation and government remarks
+  var mun = req.query.mun;
+  var brgy = req.query.brgy;
+ 
+  const query = `SELECT 
+    fh_v_id, 
+    CONCAT(v_lname, ', ', v_fname, ' ', v_mname) as fullname, 
+    leader_v_id, 
+    purok_st, 
+    (SELECT remarks_txt 
+     FROM v_remarks 
+     INNER JOIN quick_remarks ON quick_remarks.remarks_id = v_remarks.remarks_id 
+     WHERE category_id = '55' AND v_id = fh_v_id 
+     ORDER BY v_remarks_id DESC LIMIT 1) as cong, 
+    (SELECT remarks_txt 
+     FROM v_remarks 
+     INNER JOIN quick_remarks ON quick_remarks.remarks_id = v_remarks.remarks_id 
+     WHERE category_id = '56' AND v_id = fh_v_id 
+     ORDER BY v_remarks_id DESC LIMIT 1) as gov,
+     (SELECT remarks_txt 
+     FROM v_remarks 
+     INNER JOIN quick_remarks ON quick_remarks.remarks_id = v_remarks.remarks_id 
+     WHERE category_id = '57' AND v_id = fh_v_id 
+     ORDER BY v_remarks_id DESC LIMIT 1) as vgov 
+  FROM head_household 
+  INNER JOIN v_info ON v_info.v_id = head_household.fh_v_id 
+  INNER JOIN barangays ON barangays.id = v_info.barangayId
+  WHERE municipality = '${mun}' AND barangay = '${brgy}'`;
+
+  db.query(query, (error, results) => {
+    if (error) {
+      console.error("Database error:", error);
+      return res.status(500).json({ error: "Database error occurred" });
+    }
+
+    // Return the results directly to the client
+    res.json({ 
+      message: `Retrieved ${results.length} records successfully`,
+      data: results 
+    });
+  });
+});
+
+
+// Express.js endpoint to check if a user has a specific tag
+app.get('/checkIfHasTag', (req, res) => {
+  // Get query parameters
+  const { id, tag } = req.query;
+
+  // Validate parameters
+  if (!id || !tag) {
+    return res.status(400).json({ 
+      success: false, 
+      message: 'Missing required parameters: id and tag are required' 
+    });
+  }
+
+  // SQL query to check if the voter has the specified tag
+  const query = `
+    SELECT COUNT(*) as hasTag FROM v_remarks WHERE v_id = ? AND remarks_id = ? LIMIT 1
+  `;
+  
+  // Execute the database query
+  db.query(query, [id, tag], (error, results) => {
+    if (error) {
+      console.error('Database error:', error);
+      return res.status(500).json({ 
+        success: false, 
+        message: 'Database error occurred' 
+      });
+    }
+    
+    // Check if the tag exists (if count > 0)
+    const hasTag = results[0].hasTag > 0;
+    
+    // Return the result
+    res.json({
+      success: true,
+      hasTag: hasTag
+    });
+  });
+});
+
+app.post("/deleteAttendance", async (req, res) => {
+  const { leader_id, userid, attendance_status } = req.body;
+
+  try {
+    const query = `
+      DELETE from leader_registrations WHERE leader_id = ?`;
+
+    const result = await db.query(query, [
+      leader_id,
+    ]);
+
+    if (result) {
+      res.status(200).json({ message: "Attendance marked successfully." });
+    } else {
+      res.status(400).json({ message: "Failed to mark attendance." });
+    }
+  } catch (error) {
+    console.error("Error marking attendance:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+});
+app.post("/deleteSign", (req, res) => {
+  const voterid = req.query.vid;
+  const query =
+    "DELETE from v_imgtbl WHERE v_id = '" + voterid + "' AND type = 3";
+
+  db.query(query, function (err, result) {
+    if (err) throw err;
+    //console.log("File name saved in database:", filename);
+    // console.log(result);
+    // console.log(query);
+    res.send(result);
+  });
+  // const filePath = path.join(__dirname, 'public', 'profiles', voterId, imgname);
+
+  // fs.unlink(filePath, (err) => {
+  //   if (err) {
+  //     console.error('Error deleting file:', err);
+  //     return res.status(500).json({ success: false, message: 'File deletion failed.' });
+  //   }
+
+  //   res.json({ success: true, message: 'File deleted successfully.' });
+  // });
+});
+
+
 app.get("/getleadersincliquidation", (req, res) => {
   var mun = req.query.mun;
   var brgy = req.query.brgy;
@@ -3677,7 +3712,7 @@ app.get("/getleadersincliquidation", (req, res) => {
   var timeTo = req.query.timeTo;
 
   var type = req.query.type;
-  console.log(type);
+  console.log(type)
 
   let typequery = "";
   if (type !== "") {
@@ -3753,130 +3788,112 @@ app.get("/getleadersincliquidation", (req, res) => {
   }
 });
 
-app.get("/get-survey-warding-head-of-household", (req, res) => {
-  // Query to get household data with congregation and government remarks
-  var mun = req.query.mun;
-  var brgy = req.query.brgy;
 
-  const query = `SELECT 
-    fh_v_id, 
-    CONCAT(v_lname, ', ', v_fname, ' ', v_mname) as fullname, 
-    leader_v_id, 
-    purok_st, 
-    (SELECT remarks_txt 
-     FROM v_remarks 
-     INNER JOIN quick_remarks ON quick_remarks.remarks_id = v_remarks.remarks_id 
-     WHERE category_id = '55' AND v_id = fh_v_id 
-     ORDER BY v_remarks_id DESC LIMIT 1) as cong, 
-    (SELECT remarks_txt 
-     FROM v_remarks 
-     INNER JOIN quick_remarks ON quick_remarks.remarks_id = v_remarks.remarks_id 
-     WHERE category_id = '56' AND v_id = fh_v_id 
-     ORDER BY v_remarks_id DESC LIMIT 1) as gov,
-     (SELECT remarks_txt 
-     FROM v_remarks 
-     INNER JOIN quick_remarks ON quick_remarks.remarks_id = v_remarks.remarks_id 
-     WHERE category_id = '57' AND v_id = fh_v_id 
-     ORDER BY v_remarks_id DESC LIMIT 1) as vgov 
-  FROM head_household 
-  INNER JOIN v_info ON v_info.v_id = head_household.fh_v_id 
-  INNER JOIN barangays ON barangays.id = v_info.barangayId
-  WHERE municipality = '${mun}' AND barangay = '${brgy}'`;
+app.get("/getIncRegistration", (req, res) => {
+  var mun = req.query.municipality;
+  var brgy = req.query.barangay;
 
-  db.query(query, (error, results) => {
-    if (error) {
-      console.error("Database error:", error);
-      return res.status(500).json({ error: "Database error occurred" });
-    }
+  const datestring = getCurrentDate();
+  const datenow = `${datestring.date}`;
 
-    // Return the results directly to the client
-    res.json({
-      message: `Retrieved ${results.length} records successfully`,
-      data: results,
-    });
-  });
-});
-
-// Express.js endpoint to check if a user has a specific tag
-app.get("/checkIfHasTag", (req, res) => {
-  // Get query parameters
-  const { id, tag } = req.query;
-
-  // Validate parameters
-  if (!id || !tag) {
-    return res.status(400).json({
-      success: false,
-      message: "Missing required parameters: id and tag are required",
-    });
+  let brgyquery = "";
+  if (brgy && brgy !== "") {
+    brgyquery = ` AND barangay = '${brgy}' `;
   }
-
-  // SQL query to check if the voter has the specified tag
-  const query = `
-    SELECT COUNT(*) as hasTag FROM v_remarks WHERE v_id = ? AND remarks_id = ?
-  `;
-
-  // Execute the database query
-  db.query(query, [id, tag], (error, results) => {
-    console.log(query + " " + id + " " + tag);
-    if (error) {
-      console.error("Database error:", error);
-      return res.status(500).json({
-        success: false,
-        message: "Database error occurred",
-      });
-    }
-
-    // Check if the tag exists (if count > 0)
-    const hasTag = results[0].hasTag > 0;
-
-    // Return the result
-    res.json({
-      success: true,
-      hasTag: hasTag,
-    });
-  });
-});
-
-app.post("/deleteAttendance", async (req, res) => {
-  const { leader_id, userid, attendance_status } = req.body;
 
   try {
-    const query = `
-      DELETE from leader_registrations WHERE leader_id = ?`;
+    // Updated query to include leader's profile photo
+    const sql = `
+      SELECT 
+    barangay, 
+    municipality, 
+    v_fname, 
+    v_mname, 
+    v_lname, 
+    record_type, 
+    v_info.v_id as vid,
+    v_info.v_id,
+    -- Combining remarks_id and remarks_txt into one string
+    (SELECT v_remarks.remarks_id
+     FROM v_remarks 
+     INNER JOIN quick_remarks 
+       ON v_remarks.remarks_id = quick_remarks.remarks_id 
+     WHERE category_id = 199 AND v_remarks.v_id = vid
+     LIMIT 1) as type,
+    -- Get the latest profile image for the leader
+    -- Count of images with type = 3
+    (SELECT COUNT(*) 
+     FROM v_imgtbl 
+     WHERE v_id = vid 
+       AND v_imgtbl.type = 3) AS signature,
+    -- Attendance status
+    (SELECT attendance_status 
+     FROM leader_registrations 
+     WHERE leader_id = v_info.v_id 
+       AND date_registered LIKE '%${datenow}%' 
+     LIMIT 1) AS attendance_status
+FROM 
+    v_info
+INNER JOIN 
+    barangays 
+    ON barangays.id = v_info.barangayId 
+WHERE 
+    municipality = '${mun}' 
+    ${brgyquery}
+  AND record_type = 1
+ORDER BY 
+    barangayId, v_lname, v_mname ASC
+`;
 
-    const result = await db.query(query, [leader_id]);
-
-    if (result) {
-      res.status(200).json({ message: "Attendance marked successfully." });
-    } else {
-      res.status(400).json({ message: "Failed to mark attendance." });
-    }
+    db.query(sql, (error, result) => {
+      if (error) {
+        console.error("Error fetching data:", error);
+        res.status(500).json({ message: "Internal Server Error" });
+        return;
+      }
+      // Modify result to include the full path for the profile image
+      const updatedResult = result.map((leader) => {
+        // Assuming photos are stored in '/profiles/{leaderId}/{imgName}'
+        const photoPath = leader.profile_photo
+          ? `${leader.v_id}/${leader.profile_photo}`
+          : `userprofiles/k.jpg`; // Default photo if no profile photo exists
+        return { ...leader, photo: photoPath }; // Add photo path to each leader
+      });
+      console.log(updatedResult);
+      res.send(updatedResult); // Send the updated leaders list with photo paths
+    });
   } catch (error) {
-    console.error("Error marking attendance:", error);
-    res.status(500).json({ message: "Internal server error." });
+    console.error("Error fetching data:", error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 });
 
-app.post("/deleteSign", (req, res) => {
-  const voterid = req.query.vid;
-  const query =
-    "DELETE from v_imgtbl WHERE v_id = '" + voterid + "' AND type = 3";
 
-  db.query(query, function (err, result) {
-    if (err) throw err;
-    //console.log("File name saved in database:", filename);
-    // console.log(result);
-    // console.log(query);
-    res.send(result);
-  });
-  // const filePath = path.join(__dirname, 'public', 'profiles', voterId, imgname);
+app.post("/updateHouseholdLeader", async (req, res) => {
+  const { fhid, leaderid } = req.query; // Retrieve query parameter if needed
+  const datestring = getCurrentDate();
+  const datenow = `${datestring.date} ${datestring.time}`;
 
-  // fs.unlink(filePath, (err) => {
-  //   if (err) {
-  //     console.error('Error deleting file:', err);
-  //     return res.status(500).json({ success: false, message: 'File deletion failed.' });
-  //   }
+  try {
+    if (!fhid || !leaderid) {
+      return res
+        .status(400)
+        .json({ error: "Family head ID (fhid) is required" });
+    }
 
-  //   res.json({ success: true, message: 'File deleted successfully.' });
-  // });
+    // Update query to modify the purok_st based on fhid
+    const query = `UPDATE head_household SET leader_v_id = ? WHERE fh_v_id = ? `;
+    db.query(query, [leaderid, fhid], (err, result) => {
+      console.log(query);
+      if (err) {
+        console.error("Database error:", err);
+        return res.status(500).json({ error: "Failed to update record" });
+      }
+      console.log("Update result:", result);
+      return res.status(200).json({ message: "Record updated successfully" });
+    });
+  } catch (error) {
+    console.error("Unexpected error:", error);
+    res.status(500).json({ error: "Server error" });
+  }
 });

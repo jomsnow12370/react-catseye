@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button, Card } from "react-bootstrap";
 import CreateTag from "./CreateTag";
 
-const HouseholdWardingTags = ({ leader, userId }) => {
+const HouseholdWardingTags = ({ leader, userId, mun }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleSection = () => {
@@ -88,7 +88,7 @@ const HouseholdWardingTags = ({ leader, userId }) => {
                 tagId="680"
                 userId={userId}
               />
-                         <br></br>
+              <br></br>
               <div>Vice-Governor</div>
               <CreateTag
                 id={leader.v_id}
@@ -113,7 +113,44 @@ const HouseholdWardingTags = ({ leader, userId }) => {
                 tagId="681"
                 userId={userId}
               />
-                         <br></br>
+              {mun == "VIRAC" && (
+                <>
+                  <div>Mayor</div>
+                  <CreateTag
+                    id={leader.v_id}
+                    tagName="Boboy Cua(Survey 2025)"
+                    tagTooltip="BC"
+                    tagId="693"
+                    userId={userId}
+                  />
+
+                  <CreateTag
+                    id={leader.v_id}
+                    tagName="Posoy(Survey 2025)"
+                    tagTooltip="PS"
+                    tagId="694"
+                    userId={userId}
+                  />
+
+                  <CreateTag
+                    id={leader.v_id}
+                    tagName="Arcilla(Survey 2025)"
+                    tagTooltip="AA"
+                    tagId="695"
+                    userId={userId}
+                  />
+
+                  <CreateTag
+                    id={leader.v_id}
+                    tagName="UndecidedMayor(Survey 2025)"
+                    tagTooltip="UD"
+                    tagId="696"
+                    userId={userId}
+                  />
+                </>
+              )}
+
+              <br></br>
               <div>Others</div>
               <CreateTag
                 id={leader.v_id}
