@@ -494,7 +494,7 @@ const Warding = () => {
                             />
                           </td>
                         </tr>
-                      ))
+                      ))  
                     ) : (
                       <tr>
                         <td colSpan="6" className="text-center">

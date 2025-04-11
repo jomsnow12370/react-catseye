@@ -17,14 +17,14 @@ const Login = () => {
     const performInitialSetup = async () => {
       // Check if this is the first load (not a refresh)
       const refreshFlag = sessionStorage.getItem("hasRefreshed");
-      
+
       if (!refreshFlag) {
         // Store flag to prevent additional refreshes
         sessionStorage.setItem("hasRefreshed", "true");
-        
+
         // Ensure IP is fetched and stored before refresh
         await fetchAndStoreIp();
-        
+
         // Trigger a single refresh
         window.location.reload();
       } else {
@@ -62,12 +62,13 @@ const Login = () => {
     setShowModal(false);
     navigate(path);
   };
-
   return (
     <Container className="d-flex justify-content-center align-items-center vh-100">
       <Card className="p-4 shadow-lg">
         <h3 className="text-center mb-4">Login to Access</h3>
-        {errorMessage && <p className="text-danger text-center">{errorMessage}</p>}
+        {errorMessage && (
+          <p className="text-danger text-center">{errorMessage}</p>
+        )}
 
         <Form onSubmit={handleLogin}>
           <Form.Group className="mb-3">
@@ -103,13 +104,21 @@ const Login = () => {
         </Modal.Header>
         <Modal.Body>
           <p className="text-center">Where would you like to go?</p>
-          <Button variant="success" className="w-100 mb-2" onClick={() => handleNavigation("/registration")}>
+          <Button
+            variant="success"
+            className="w-100 mb-2"
+            onClick={() => handleNavigation("/registration")}
+          >
             Go to Leader Registration
           </Button>
           {/* <Button variant="info" className="w-100 mb-2" onClick={() => handleNavigation("/incregistration")}>
             Go to Inc Registration
           </Button> */}
-          <Button variant="dark" className="w-100" onClick={() => handleNavigation("/wardinglogs")}>
+          <Button
+            variant="dark"
+            className="w-100"
+            onClick={() => handleNavigation("/wardinglogs")}
+          >
             Go to Dashboard
           </Button>
         </Modal.Body>

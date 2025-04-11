@@ -37,10 +37,11 @@ const WardingLogs = () => {
 
   const [wardingData, setWardingData] = useState([]);
 
+  // Replace the current sorting function with this one:
   const sortedUsersData = usersData.slice().sort((a, b) => {
-    const totalA = 0;
-    const totalB = 0;
-    return totalB - totalA;
+    const totalA = a.headhousehold + a.members;
+    const totalB = b.headhousehold + b.members;
+    return totalB - totalA; // Sort in descending order (highest first)
   });
 
   const handleClickCalendar = (event) => {
@@ -173,14 +174,14 @@ const WardingLogs = () => {
           <Col xl={4} md={4} className="mb-3">
             <div
               class="card card-stats draggable"
-              style={{cursor: "pointer"}}
+              style={{ cursor: "pointer" }}
               onClick={() => handleTotalWardedClick()}
             >
               <div class="card-body">
                 <div class="row">
                   <div class="col">
                     <h5 class="card-title text-uppercase text-muted mb-0">
-                      Total Warded 
+                      Total Warded
                     </h5>
                     <span class="h2 font-weight-bold mb-0">
                       {total[0]?.headhousehold + total[0]?.members ?? 0}
@@ -410,7 +411,10 @@ const WardingLogs = () => {
         size="lg"
       >
         <Modal.Body>
-          <div style={{ padding: "20px", maxHeight: "60vh" }} className="table-responsive">
+          <div
+            style={{ padding: "20px", maxHeight: "60vh" }}
+            className="table-responsive"
+          >
             <h3 className="mb-3">Warding Total</h3>
             {/* {wardingData || "No warding data.."} */}
             <Table className="table-bordered table-hovered">
